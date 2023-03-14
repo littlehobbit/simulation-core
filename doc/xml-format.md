@@ -237,7 +237,7 @@
         <device id="0"
                 name="eth0" 
                 type="Csma" >  
-          <address network="10.01.22.222" netmask="255.255.255.0"/>
+          <address value="10.01.22.222" netmask="255.255.255.0"/>
 
           <attribures>
             <attribute key="Address" value="AB:CD:EF:01:02:03"/>
@@ -248,7 +248,7 @@
       </device-list>
 
       <applications>
-        <application name="EchoClient" type="UdpEchoClientApplication">
+        <application name="EchoClient" type="ns3::UdpEchoClientApplication">
           <attributes>
             <attribute key="Port" value="666">
             <attribute key="Remote" value="10.01.22.2">
@@ -257,7 +257,35 @@
       </applications>
     </node>
 
-    <!-- TODO: extend example -->
+    <node id="1" name="Server">
+      <device-list>
+        <device id="0" name="eth0">
+          <address value="10.01.22.2" netmask="255.255.255.0"/>
+            <attribures>
+              <attribute key="Mtu" value="1200"/>
+              <attribute key="EncapsulationMode" value="Llc"/>
+            </attribures>
+        </device>
+      </device-list>
+      
+      <applications>
+        <application name="EchoServer" type="ns3::UdpEchoServerApplication">
+          <attributes>
+            <attribute key="Port" value="666">
+            <attribute key="Remote" value="10.01.22.222">
+          </attributes>
+        </application>
+      </applications>
+    </node>
   </node-list>
+
+  <connections>
+    <connection name="Client-to-Server" type=Csma>
+      <interfaces>
+        <interface>Client/eth0</interface>
+        <interface>Server/eth0</interface>
+      </interfaces>
+    </connection>
+  </connections>
 </model>
 ```
