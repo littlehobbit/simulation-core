@@ -1,0 +1,14 @@
+[
+    { include: ['"spdlog/spdlog.h"',                        "private", "<spdlog/spdlog.h>", "public"] },
+    { include: ['"spdlog/fmt/bundled/format.h"',            "private", "<spdlog/spdlog.h>", "public"] },
+    { include: ['"spdlog/fmt/bundled/core.h"',              "private", "<spdlog/spdlog.h>", "public"]},
+    { include: ["<asio/detail/handler_cont_helpers.hpp>",   "private", "<asio/buffered_read_stream.hpp>", "public"] }, # is_continuation
+    { include: ["<asio/impl/io_context.ipp>",               "private", "<asio/io_service.hpp>", "public"] },
+    { include: ["<asio/ip/impl/address.ipp>",               "private", "<asio/ip/address.hpp>", "public"]},
+    { include: ["<asio/ip/impl/address_v4.ipp>",            "private", "<asio/ip/address_v4.hpp>", "public"]},
+    { include: ["<asio/ip/impl/address_v4.hpp>",            "private", "<asio/ip/address_v4.hpp>", "public"]},
+    { include: ["<asio/ip/impl/network_v4.ipp>",            "private", "<asio/ip/network_v4.hpp>", "public"]},
+    { include: ["<bits/cxxabi_forced.h>",                   "private", "<ctime>", "public"]},
+    { include: ['"ThorSerialize/JsonPrinter.source"',       "private", "<ThorSerialize/JsonPrinter.h>", "public"]},
+    { include: ['"ThorSerialize/Serialize.tpp"',            "private", "<ThorSerialize/Serialize.h>", "public"]},
+]
