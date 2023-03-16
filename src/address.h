@@ -1,5 +1,5 @@
-#ifndef ADDRESS_H
-#define ADDRESS_H
+#ifndef __ADDRESS_H_4CFIY4L3N4JV__
+#define __ADDRESS_H_4CFIY4L3N4JV__
 
 #include <array>
 #include <optional>
@@ -62,4 +62,4 @@ inline auto from_string_v6(std::string_view address,
 
 }  // namespace address
 
-#endif  // ADDRESS_H
+#endif  // __ADDRESS_H_4CFIY4L3N4JV__

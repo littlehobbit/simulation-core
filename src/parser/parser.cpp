@@ -13,7 +13,7 @@
 
 using namespace std::literals;
 
-namespace parse {
+namespace parser {
 
 constexpr auto model_tag = "model";
 constexpr auto populate_tag = "populate-routing-tables";
@@ -345,4 +345,4 @@ auto XmlParser::parse_statistics(const tinyxml2::XMLElement *root)
   return registrators;
 }
 
-}  // namespace parse
+}  // namespace parser

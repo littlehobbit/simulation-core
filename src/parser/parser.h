@@ -1,5 +1,5 @@
-#ifndef PARSER_H
-#define PARSER_H
+#ifndef __PARSER_H_D9TYRJ9QIR76__
+#define __PARSER_H_D9TYRJ9QIR76__
 
 #include <cstdint>
 #include <exception>
@@ -18,7 +18,7 @@ namespace tinyxml2 {
 class XMLElement;
 }
 
-namespace parse {
+namespace parser {
 
 using Attributes = std::map<std::string, std::string>;
 
@@ -140,6 +140,6 @@ class XmlParser {
       -> std::vector<RegistratorDescription>;
 };
 
-};  // namespace parse
+};  // namespace parser
 
-#endif
+#endif  // __PARSER_H_D9TYRJ9QIR76__

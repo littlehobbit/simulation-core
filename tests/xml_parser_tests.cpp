@@ -30,7 +30,7 @@ TEST(TinyXmlTest, ReadingBoolValue) {  // NOLINT
 }
 
 TEST(XmlParse, ThrowOnIncorrectXml) {  // NOLINT
-  parse::XmlParser parser;
+  parser::XmlParser parser;
 
   const auto* xml =
       R"(
@@ -39,7 +39,7 @@ TEST(XmlParse, ThrowOnIncorrectXml) {  // NOLINT
         </model>
       )";
 
-  ASSERT_THROW(parser.parse(xml), parse::ParseError);
+  ASSERT_THROW(parser.parse(xml), parser::ParseError);
 }
 
 // NOTE: maybe divide this test-case to
@@ -48,7 +48,7 @@ TEST(XmlParse, ThrowOnIncorrectXml) {  // NOLINT
 //  - test case of addresses
 //  - test case of attributes
 TEST(XmlParse, ReadingNode) {  // NOLINT
-  parse::XmlParser parser;
+  parser::XmlParser parser;
 
   const auto* xml =
       R"(
@@ -136,7 +136,7 @@ TEST(XmlParse, ReadingNode) {  // NOLINT
 }
 
 TEST(XmlParse, ReadsConnections) {  // NOLINT
-  parse::XmlParser parser;
+  parser::XmlParser parser;
 
   const auto* xml =
       R"(
@@ -170,7 +170,7 @@ TEST(XmlParse, ReadsConnections) {  // NOLINT
 }
 
 TEST(XmlParse, ReadsRegistrators) {  // NOLINT
-  parse::XmlParser parser;
+  parser::XmlParser parser;
 
   const auto* xml =
       R"(
@@ -210,7 +210,7 @@ TEST(XmlParse, ReadsRegistrators) {  // NOLINT
 }
 
 TEST(XmlParse, IncorrectNodeReading) {  // NOLINT
-  parse::XmlParser parser;
+  parser::XmlParser parser;
 
   {
     // none id
@@ -223,7 +223,7 @@ TEST(XmlParse, IncorrectNodeReading) {  // NOLINT
         </model>
     )";
 
-    EXPECT_THROW(parser.parse(xml), parse::ParseError);
+    EXPECT_THROW(parser.parse(xml), parser::ParseError);
   }
 
   {
@@ -236,12 +236,12 @@ TEST(XmlParse, IncorrectNodeReading) {  // NOLINT
           </node>
         </model>
     )";
-    EXPECT_THROW(parser.parse(xml), parse::ParseError);
+    EXPECT_THROW(parser.parse(xml), parser::ParseError);
   }
 }
 
 TEST(XmlParse, ErrorOnMultiplePopulate) {  // NOLINT
-  parse::XmlParser parser;
+  parser::XmlParser parser;
 
   const auto* xml =
       R"(
@@ -255,11 +255,11 @@ TEST(XmlParse, ErrorOnMultiplePopulate) {  // NOLINT
       </model>
     )";
 
-  ASSERT_THROW(parser.parse(xml), parse::ParseError);  // NOLINT
+  ASSERT_THROW(parser.parse(xml), parser::ParseError);  // NOLINT
 }
 
 TEST(XmlParse, BadAttributes) {  // NOLINT
-  parse::XmlParser parser;
+  parser::XmlParser parser;
 
   {
     const auto* no_value =
@@ -279,7 +279,7 @@ TEST(XmlParse, BadAttributes) {  // NOLINT
           </node>
         </model>
     )";
-    EXPECT_THROW(parser.parse(no_value), parse::ParseError);
+    EXPECT_THROW(parser.parse(no_value), parser::ParseError);
   }
 
   {
@@ -300,12 +300,12 @@ TEST(XmlParse, BadAttributes) {  // NOLINT
           </node>
         </model>
     )";
-    EXPECT_THROW(parser.parse(no_key), parse::ParseError);
+    EXPECT_THROW(parser.parse(no_key), parser::ParseError);
   }
 }
 
 TEST(XmlParse, ModelRequiresName) {  // NOLINT
-  parse::XmlParser parser;
+  parser::XmlParser parser;
 
   const auto* xml =
       R"(
@@ -314,11 +314,11 @@ TEST(XmlParse, ModelRequiresName) {  // NOLINT
       </model>
     )";
 
-  ASSERT_THROW(parser.parse(xml), parse::ParseError);
+  ASSERT_THROW(parser.parse(xml), parser::ParseError);
 }
 
 TEST(XmlParse, ErrorOnNoModelTag) {  // NOLINT
-  parse::XmlParser parser;
+  parser::XmlParser parser;
 
   const auto* xml =
       R"(
@@ -327,7 +327,7 @@ TEST(XmlParse, ErrorOnNoModelTag) {  // NOLINT
         </node-list>
       )";
 
-  ASSERT_THROW(parser.parse(xml), parse::ParseError);
+  ASSERT_THROW(parser.parse(xml), parser::ParseError);
 }
 
 TEST(XmlParseUtil, ExtractAttribute) {  // NOLINT
@@ -338,10 +338,10 @@ TEST(XmlParseUtil, ExtractAttribute) {  // NOLINT
   tinyxml2::XMLDocument doc;
   doc.Parse(xml);
 
-  ASSERT_EQ(parse::util::get_attribute<int>(doc.RootElement(), "value_int"),
+  ASSERT_EQ(parser::util::get_attribute<int>(doc.RootElement(), "value_int"),
             42);
   ASSERT_STREQ(
-      parse::util::get_attribute<const char*>(doc.RootElement(), "value_str"),
+      parser::util::get_attribute<const char*>(doc.RootElement(), "value_str"),
       "string");
 }
 
@@ -353,8 +353,8 @@ TEST(XmlParseUtil, ThrowOnRequiredMissing) {  // NOLINT
   tinyxml2::XMLDocument doc;
   doc.Parse(xml);
 
-  EXPECT_THROW(parse::util::get_attribute<int>(doc.RootElement(), "missed"),
-               parse::ParseError);
+  EXPECT_THROW(parser::util::get_attribute<int>(doc.RootElement(), "missed"),
+               parser::ParseError);
 }
 
 TEST(XmlParseUtil, DefaultOnNonRequiredMissing) {  // NOLINT
@@ -365,10 +365,10 @@ TEST(XmlParseUtil, DefaultOnNonRequiredMissing) {  // NOLINT
   tinyxml2::XMLDocument doc;
   doc.Parse(xml);
 
-  ASSERT_EQ(parse::util::get_attribute<int>(doc.RootElement(), "missed", false),
+  ASSERT_EQ(parser::util::get_attribute<int>(doc.RootElement(), "missed", false),
             int{});
   ASSERT_EQ(
-      parse::util::get_attribute<int>(doc.RootElement(), "missed", false, 42),
+      parser::util::get_attribute<int>(doc.RootElement(), "missed", false, 42),
       42);
 }
 
@@ -381,9 +381,9 @@ TEST(XmlParseUtil, ThrowOnMissedType) {  // NOLINT
   doc.Parse(xml);
 
   EXPECT_THROW(
-      parse::util::get_attribute<int>(doc.RootElement(), "value", true),
-      parse::ParseError);
+      parser::util::get_attribute<int>(doc.RootElement(), "value", true),
+      parser::ParseError);
   EXPECT_THROW(
-      parse::util::get_attribute<int>(doc.RootElement(), "value", false),
-      parse::ParseError);
+      parser::util::get_attribute<int>(doc.RootElement(), "value", false),
+      parser::ParseError);
 }

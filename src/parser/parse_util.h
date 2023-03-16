@@ -1,5 +1,5 @@
-#ifndef PARSE_UTIL_H
-#define PARSE_UTIL_H
+#ifndef __PARSE_UTIL_H_5T1B4GE8TUJ5__
+#define __PARSE_UTIL_H_5T1B4GE8TUJ5__
 
 #include <string_view>
 
@@ -7,7 +7,7 @@
 
 #include "parser.h"
 
-namespace parse::util {
+namespace parser::util {
 
 template <typename T>
 T get_attribute(const tinyxml2::XMLElement* element, std::string_view attribute,
@@ -92,6 +92,6 @@ struct xml_element_range {
   std::string_view tag;
 };
 
-};  // namespace parse::util
+};  // namespace parser::util
 
-#endif  // PARSE_UTIL_H
+#endif  // __PARSE_UTIL_H_5T1B4GE8TUJ5__

@@ -6,7 +6,7 @@
 
 #include "parser.h"
 
-namespace parse {
+namespace parser {
 
 AttributeError::AttributeError(std::string_view what, std::string_view tag,
                                std::string_view attribute,
@@ -20,4 +20,4 @@ AttributeError::AttributeError(std::string_view what,
                                const tinyxml2::XMLElement *element)
     : AttributeError(what, element->Name(), attribute, element->GetLineNum()) {}
 
-}  // namespace parse
+}  // namespace parser

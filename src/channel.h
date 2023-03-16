@@ -1,5 +1,5 @@
-#ifndef CHANNEL_H
-#define CHANNEL_H
+#ifndef __CHANNEL_H_5R0UZOSTZ1NM__
+#define __CHANNEL_H_5R0UZOSTZ1NM__
 
 #include <optional>
 #include <string_view>
@@ -23,4 +23,4 @@ constexpr auto from_string(std::string_view str) noexcept
 
 }  // namespace channel
 
-#endif  // CHANNEL_H
+#endif  // __CHANNEL_H_5R0UZOSTZ1NM__

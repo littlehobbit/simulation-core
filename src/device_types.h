@@ -1,5 +1,5 @@
-#ifndef DEVICE_TYPES_H
-#define DEVICE_TYPES_H
+#ifndef __DEVICE_TYPES_H_BWKCLPP7U6UU__
+#define __DEVICE_TYPES_H_BWKCLPP7U6UU__
 
 #include <array>
 #include <optional>
@@ -24,4 +24,4 @@ constexpr auto from_string(std::string_view str) noexcept
 
 }  // namespace device
 
-#endif  // DEVICE_TYPES_H
+#endif  // __DEVICE_TYPES_H_BWKCLPP7U6UU__
