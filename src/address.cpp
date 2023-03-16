@@ -1,10 +1,11 @@
 #include "address.h"
 
-#include <iostream>
+#include <cstdio>
 #include <optional>
 
 namespace address {
 
+// TODO: fix or remove
 std::optional<MacAddress> MacAddress::from_string(
     std::string_view str) noexcept {
   MacAddress address;

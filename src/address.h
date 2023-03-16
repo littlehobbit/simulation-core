@@ -2,15 +2,14 @@
 #define __ADDRESS_H_4CFIY4L3N4JV__
 
 #include <array>
+#include <cstdint>
 #include <optional>
 #include <string_view>
 
-#include <boost/asio.hpp>
 #include <boost/asio/ip/address_v4.hpp>
 #include <boost/asio/ip/address_v6.hpp>
 #include <boost/asio/ip/network_v4.hpp>
-#include <boost/asio/ip/udp.hpp>
-#include <boost/system/error_code.hpp>
+#include <boost/asio/ip/network_v6.hpp>
 
 namespace address {
 

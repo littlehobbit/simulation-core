@@ -1,10 +1,9 @@
 #include "parser.h"
 
-#include <cstddef>
-#include <cstdint>
 #include <optional>
 #include <string>
 #include <string_view>
+#include <type_traits>
 
 #include <tinyxml2.h>
 
