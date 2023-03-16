@@ -8,7 +8,7 @@
 
   - Элементы сети - `<node>`
     - их названия
-    - Сетевые устройства - `<device>`
+    - Сетевые устройства - `<device>`rm 
       - тип сетевого устройства `type`
       - название - `name`
       - адреса
@@ -215,6 +215,7 @@
   - `end` (опциональный) - время завершения работы регистратора
   <!-- TODO: опциональный атрибут размера кэша -->
 
+<!-- TODO: Описывать атрибуты регистратора?  -->
 ```xml
 <statistics>
   <registrator source="node-a/$ns3::TcpL4Protocol/SocketList/0/CongestionWindow"
@@ -228,7 +229,7 @@
 ## Пример
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<model name="UdpEcho">
+<model name="UdpEchoExperiment">
   <populate-routing-tables>true</populate-routing-tables>
 
   <node-list>
@@ -287,5 +288,9 @@
       </interfaces>
     </connection>
   </connections>
+
+  <statistics>
+    
+  </statistics>
 </model>
 ```
