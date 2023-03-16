@@ -195,8 +195,8 @@ auto XmlParser::parse_applications(const tinyxml2::XMLElement *node)
       auto attributes = parse_attributes(app.element);
 
       applications.push_back(
-          ApplicationDescription{.name = std::string{name},
-                                 .type = std::string{type},
+          ApplicationDescription{.name = std::move(name),
+                                 .type = std::move(type),
                                  .attributes = std::move(attributes)});
     }
   }
@@ -243,7 +243,7 @@ auto XmlParser::parse_routing(const tinyxml2::XMLElement *node)
         auto ipv4 = address::from_string_v4(network, netmask);
         if (ipv4.has_value()) {
           routing.ipv4.push_back(Ipv4Route{.network = *ipv4,
-                                           .interface = std::string{interface},
+                                           .interface = std::move(interface),
                                            .metric = metric});
         } else {
           throw ParseError("Bad Ipv4 address");
@@ -252,7 +252,7 @@ auto XmlParser::parse_routing(const tinyxml2::XMLElement *node)
         auto ipv6 = address::from_string_v6(network, prefix);
         if (ipv6.has_value()) {
           routing.ipv6.push_back(Ipv6Route{.network = *ipv6,
-                                           .interface = std::string{interface},
+                                           .interface = std::move(interface),
                                            .metric = metric});
         }
       } else {
@@ -287,7 +287,7 @@ auto XmlParser::parse_connections(const tinyxml2::XMLElement *model)
 
       connections.push_back(
           ConnectionDescription{.id = id,
-                                .name = std::string{name},
+                                .name = std::move(name),
                                 .type = *transformed_type,
                                 .interfaces = std::move(interfaces),
                                 .attributes = std::move(attributes)});
