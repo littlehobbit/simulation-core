@@ -12,6 +12,8 @@ option(RUN_IWYU ON)
 find_package(fmt REQUIRED)
 find_package(Boost REQUIRED)
 find_package(tinyxml2 REQUIRED)
+find_package(ns3 REQUIRED)
+find_package(CLI11 REQUIRED)
 
 add_executable(
   ${PROJECT_NAME}
@@ -23,7 +25,6 @@ add_library(
   ${PROJECT_NAME}_lib
   src/parser/parser.cpp
   src/parser/attribute_error.cpp
-  src/address.cpp
 )
 
 target_include_directories(
@@ -31,16 +32,27 @@ target_include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
+set(NS3_LIBS 
+  ns3::libcore
+  ns3::libnetwork
+  ns3::libinternet
+  ns3::libstats
+  ns3::libcsma
+  ns3::libpoint-to-point
+)
+
 target_link_libraries(
-  ${PROJECT_NAME}_lib
+  ${PROJECT_NAME}_lib PUBLIC
   tinyxml2::tinyxml2
   fmt::fmt
   ${Boost_LIBRARIES}
+  ${NS3_LIBS}
 )
 
 target_link_libraries(
   ${PROJECT_NAME}
   ${PROJECT_NAME}_lib
+  CLI11::CLI11
 )
 
 include(cmake/clang-tidy.cmake)
@@ -56,4 +68,4 @@ set_property(TARGET ${PROJECT_NAME}_lib PROPERTY CXX_STANDARD 17)
 if (${BUILD_TESTS})
   enable_testing()
   add_subdirectory(tests)
-endif()
+endif() 
