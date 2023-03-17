@@ -102,7 +102,7 @@ TEST(XmlParse, ReadingNode) {  // NOLINT
   auto& device = node.devices.front();
   EXPECT_EQ(device.id, 0);
   EXPECT_EQ(device.name, "eth0");
-  EXPECT_EQ(device.type, device::type::CSMA);
+  EXPECT_EQ(device.type, "Csma");
 
   ASSERT_EQ(device.ipv4_addresses.size(), 1);
   EXPECT_EQ(device.ipv4_addresses.front().address(),

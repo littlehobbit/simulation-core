@@ -12,7 +12,6 @@
 
 #include "address.h"
 #include "channel.h"
-#include "device_types.h"
 
 namespace tinyxml2 {
 class XMLElement;
@@ -25,7 +24,7 @@ using Attributes = std::map<std::string, std::string>;
 struct DeviceDescription {
   std::uint64_t id;
   std::string name;
-  device::type type;
+  std::string type;
 
   std::vector<address::Ipv4Network> ipv4_addresses;
   std::vector<address::Ipv6Network> ipv6_addresses;

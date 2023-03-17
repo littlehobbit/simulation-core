@@ -127,18 +127,13 @@ auto XmlParser::parse_devices(const tinyxml2::XMLElement *node)
       // TODO: how does string allocated?
       auto name = device.get_attribute<std::string>(name_attr);
 
-      auto device_type = device.get_attribute<std::string>(type_attr);
-      auto type = device::from_string(device_type);
-      if (!type.has_value()) {
-        throw ParseError("Bad device type");
-      }
-
+      auto type = device.get_attribute<std::string>(type_attr);
       auto [ipv4, ipv6] = parse_addresses(device.element);
       auto attributes = parse_attributes(device.element);
 
       devices.push_back(DeviceDescription{.id = id,
                                           .name = std::move(name),
-                                          .type = *type,
+                                          .type = std::move(type),
                                           .ipv4_addresses = std::move(ipv4),
                                           .ipv6_addresses = std::move(ipv6),
                                           .attributes = std::move(attributes)});
