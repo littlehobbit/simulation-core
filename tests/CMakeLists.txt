@@ -8,6 +8,7 @@ add_executable(
   ${PROJECT_NAME}
   xml_parser_tests.cpp
   address_tests.cpp
+  name_service_tests.cpp
 )
 
 target_include_directories(
