@@ -72,17 +72,22 @@ IncludeCategories:
     Priority:        1
     SortPriority:    0
 
-  - Regex:           '<([A-Za-z0-9.\/-_])+\.h(pp)*>'
+  - Regex:           '<boost/.*>'
     Priority:        2
     SortPriority:    0
 
-  - Regex:           '"([A-Za-z0-9.\/-_])+\.h(pp)*"'
+  - Regex:           '<ns3/.*>'
     Priority:        3
     SortPriority:    0
 
-  - Regex:           '*'
+  - Regex:           '<([A-Za-z0-9.\/-_])+\.h(pp)*>'
     Priority:        4
     SortPriority:    0
+
+  - Regex:           '"([A-Za-z0-9.\/-_])+\.h(pp)*"'
+    Priority:        5
+    SortPriority:    0
+
 
 IncludeIsMainRegex: '([-_](test|unittest))?$'
 IncludeIsMainSourceRegex: ''

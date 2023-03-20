@@ -3,10 +3,11 @@
 
 #include <stdexcept>
 
-#include <fmt/core.h>
 #include <ns3/names.h>
 #include <ns3/object.h>
 #include <ns3/ptr.h>
+
+#include <fmt/core.h>
 
 namespace model::names {
 

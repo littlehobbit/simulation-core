@@ -3,14 +3,15 @@
 #include <map>
 #include <utility>
 
-#include <fmt/core.h>
 #include <ns3/application.h>
+#include <ns3/object-factory.h>
 #include <ns3/string.h>
+#include <ns3/type-id.h>
+
+#include <fmt/core.h>
 
 #include "model_build_error.h"
 #include "parser/parser.h"
-#include <ns3/object-factory.h>
-#include <ns3/type-id.h>
 
 namespace model {
 

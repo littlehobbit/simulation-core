@@ -3,19 +3,20 @@
 #include <map>
 #include <utility>
 
-#include <fmt/core.h>
 #include <ns3/address.h>
-#include <ns3/object.h>
-#include <ns3/string.h>
-
-#include "address.h"
-#include "model_build_error.h"
-#include "parser/parser.h"
 #include <ns3/csma-net-device.h>
 #include <ns3/ipv4-interface-address.h>
 #include <ns3/mac48-address.h>
 #include <ns3/net-device.h>
+#include <ns3/object.h>
 #include <ns3/point-to-point-net-device.h>
+#include <ns3/string.h>
+
+#include <fmt/core.h>
+
+#include "address.h"
+#include "model_build_error.h"
+#include "parser/parser.h"
 
 namespace model {
 

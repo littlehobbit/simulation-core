@@ -8,11 +8,10 @@
 
 #include <boost/algorithm/string/case_conv.hpp>
 
-#include <ns3/ptr.h>
-
 #include <ns3/ipv4-interface-address.h>
 #include <ns3/ipv6-interface-address.h>
 #include <ns3/net-device.h>
+#include <ns3/ptr.h>
 
 // IWYU pragma: no_include <boost/iterator/iterator_facade.hpp>
 

@@ -4,9 +4,16 @@
 
 #include <boost/asio/ip/address_v4.hpp>
 
-#include <fmt/core.h>
+#include <ns3/internet-stack-helper.h>
+#include <ns3/ipv4-address.h>
+#include <ns3/ipv4-static-routing-helper.h>
+#include <ns3/ipv4-static-routing.h>
+#include <ns3/ipv6-static-routing-helper.h>
+#include <ns3/ipv6-static-routing.h>
 #include <ns3/node.h>
 #include <ns3/object.h>
+
+#include <fmt/core.h>
 
 #include "address.h"
 #include "model/application.h"
@@ -14,12 +21,6 @@
 #include "model/model_build_error.h"
 #include "name_service.h"
 #include "parser/parser.h"
-#include <ns3/internet-stack-helper.h>
-#include <ns3/ipv4-address.h>
-#include <ns3/ipv4-static-routing-helper.h>
-#include <ns3/ipv4-static-routing.h>
-#include <ns3/ipv6-static-routing-helper.h>
-#include <ns3/ipv6-static-routing.h>
 
 namespace model {
 

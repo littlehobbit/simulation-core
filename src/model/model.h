@@ -3,12 +3,11 @@
 
 #include <vector>
 
-#include <ns3/node.h>
-#include <ns3/ptr.h>
-
 #include <ns3/channel-list.h>
 #include <ns3/net-device.h>
 #include <ns3/node-container.h>
+#include <ns3/node.h>
+#include <ns3/ptr.h>
 
 namespace parser {
 struct ModelDescription;
