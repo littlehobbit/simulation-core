@@ -2,6 +2,7 @@
 
 #include <boost/asio/ip/address_v6.hpp>
 #include <boost/asio/ip/network_v6.hpp>
+
 #include <gtest/gtest.h>
 #include <tinyxml2.h>
 
@@ -365,8 +366,9 @@ TEST(XmlParseUtil, DefaultOnNonRequiredMissing) {  // NOLINT
   tinyxml2::XMLDocument doc;
   doc.Parse(xml);
 
-  ASSERT_EQ(parser::util::get_attribute<int>(doc.RootElement(), "missed", false),
-            int{});
+  ASSERT_EQ(
+      parser::util::get_attribute<int>(doc.RootElement(), "missed", false),
+      int{});
   ASSERT_EQ(
       parser::util::get_attribute<int>(doc.RootElement(), "missed", false, 42),
       42);

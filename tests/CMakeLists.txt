@@ -8,6 +8,7 @@ add_executable(
   ${PROJECT_NAME}
   xml_parser_tests.cpp
   address_tests.cpp
+  model_tests.cpp
   name_service_tests.cpp
 )
 
@@ -22,6 +23,11 @@ target_link_libraries(
   GTest::GTest
   GTest::Main
   gmock
+
+  # FIX: fix for loading static type information in run-time
+  ${LIB_AS_NEEDED_PRE}
+  ${NS3_LIBS}
+  ${LIB_AS_NEEDED_POST}
 )
 
 gtest_discover_tests(${PROJECT_NAME})

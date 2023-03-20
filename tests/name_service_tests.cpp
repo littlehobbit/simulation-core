@@ -8,7 +8,7 @@
 
 using namespace model::names;
 
-TEST(NameService, AddName) {
+TEST(NameService, AddName) {  // NOLINT
   auto node = ns3::CreateObject<ns3::Node>();
   const std::string name = "node_name";
   add(node, name);
@@ -17,7 +17,7 @@ TEST(NameService, AddName) {
   cleanup();
 }
 
-TEST(NameService, NameDuplication) {
+TEST(NameService, NameDuplication) {  // NOLINT
   auto node_1 = ns3::CreateObject<ns3::Node>();
   auto node_2 = ns3::Create<ns3::Node>();
 
@@ -28,7 +28,7 @@ TEST(NameService, NameDuplication) {
   cleanup();
 }
 
-TEST(NameService, ContextAddName) {
+TEST(NameService, ContextAddName) {  // NOLINT
   auto node = ns3::CreateObject<ns3::Node>();
   const std::string name = "node_name";
   const std::string sub_name = "sub_name";
@@ -45,7 +45,7 @@ TEST(NameService, ContextAddName) {
   cleanup();
 }
 
-TEST(NameService, ContextNameDuplication) {
+TEST(NameService, ContextNameDuplication) {  // NOLINT
   auto node = ns3::CreateObject<ns3::Node>();
   const std::string name = "node_name";
   const std::string sub_name = "sub_name";

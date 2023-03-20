@@ -6,8 +6,6 @@ option(BUILD_TESTS ON)
 option(RUN_CLANG_TIDY ON)
 option(RUN_IWYU ON)
 
-# TODO: attach
-# - ns-3 enviroment
 
 find_package(fmt REQUIRED)
 find_package(Boost REQUIRED)
@@ -25,6 +23,10 @@ add_library(
   ${PROJECT_NAME}_lib
   src/parser/parser.cpp
   src/parser/attribute_error.cpp
+  src/model/model.cpp
+  src/model/device.cpp
+  src/model/node.cpp
+  src/model/application.cpp
 )
 
 target_include_directories(
@@ -39,20 +41,28 @@ set(NS3_LIBS
   ns3::libstats
   ns3::libcsma
   ns3::libpoint-to-point
+  ns3::libapplications
 )
+
+set(LIB_AS_NEEDED_PRE -Wl,--no-as-needed)
+set(LIB_AS_NEEDED_POST -Wl,--as-needed)
 
 target_link_libraries(
   ${PROJECT_NAME}_lib PUBLIC
   tinyxml2::tinyxml2
   fmt::fmt
   ${Boost_LIBRARIES}
-  ${NS3_LIBS}
 )
 
 target_link_libraries(
   ${PROJECT_NAME}
   ${PROJECT_NAME}_lib
   CLI11::CLI11
+
+  # FIX: fix for loading static type information in run-time
+  ${LIB_AS_NEEDED_PRE}
+  ${NS3_LIBS}
+  ${LIB_AS_NEEDED_POST}
 )
 
 include(cmake/clang-tidy.cmake)
@@ -63,7 +73,6 @@ target_compile_features(${PROJECT_NAME}_lib PRIVATE cxx_std_17)
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 set_property(TARGET ${PROJECT_NAME}_lib PROPERTY CXX_STANDARD 17)
-
 
 if (${BUILD_TESTS})
   enable_testing()
