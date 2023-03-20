@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <optional>
 #include <string>
-#include <utility>
 #include <vector>
 
 #include <boost/algorithm/string/case_conv.hpp>
@@ -42,16 +41,9 @@ class Device {
   }
 
  private:
-  // TODO: remove
-  Device() = default;
-
-  Device(ns3::Ptr<ns3::NetDevice> device, std::string name,
+  Device(const ns3::Ptr<ns3::NetDevice>& device, std::string name,
          std::vector<ns3::Ipv4InterfaceAddress> ipv4,
-         std::vector<ns3::Ipv6InterfaceAddress> ipv6)
-      : _name{std::move(name)},
-        _device{std::move(device)},
-        _ipv4_addresses{std::move(ipv4)},
-        _ipv6_addresses{std::move(ipv6)} {}
+         std::vector<ns3::Ipv6InterfaceAddress> ipv6);
 
   std::string _name;
   ns3::Ptr<ns3::NetDevice> _device;
