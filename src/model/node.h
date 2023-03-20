@@ -2,6 +2,8 @@
 #define __NODE_H_PWWEHSK528G5__
 
 #include <cstddef>
+#include <map>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -12,10 +14,11 @@
 
 #include "application.h"
 #include "device.h"
+#include <ns3/net-device.h>
 
 namespace parser {
 struct NodeDescription;
-}
+}  // namespace parser
 
 namespace model {
 
@@ -40,15 +43,24 @@ class Node {
   static Node create(const parser::NodeDescription &description);
 
  private:
-  Node(ns3::Ptr<ns3::Node> node) : _node{std::move(node)} {}
+  Node(const ns3::Ptr<ns3::Node> &node) : _node{node} {}
 
   void attach(Device &&device);
 
   void attach(Application &&app);
 
+  auto get_device_by_name(const std::string &name) -> ns3::Ptr<ns3::NetDevice> {
+    if (auto it = _device_per_name.find(name); it != _device_per_name.cend()) {
+      return it->second;
+    }
+    return nullptr;
+  }
+
   ns3::Ptr<ns3::Node> _node;
   std::vector<Device> _devices;
   std::vector<Application> _applications;
+
+  std::map<std::string, ns3::Ptr<ns3::NetDevice>> _device_per_name;
 
   ns3::Ptr<ns3::Ipv4> _ipv4;
   ns3::Ptr<ns3::Ipv6> _ipv6;
