@@ -195,6 +195,11 @@ TEST(Application, ThrowOnBadAttribute) {  // NOLINT
 //   model::ModelBuildError);
 // }
 
+TEST(Application, CreateNonApplication) {  // NOLINT
+  parser::ApplicationDescription descr{.type = "ns3::CsmaNetDevice"};
+  EXPECT_THROW(model::Application::create(descr), model::ModelBuildError);
+}
+
 // TEST(Model, ErrorOnDeviceWithoutQueue) {}
 
 // TEST(Model, ErrorOnNameDuplication) {}

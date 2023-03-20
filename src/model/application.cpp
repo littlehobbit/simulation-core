@@ -27,6 +27,12 @@ auto Application::create(const parser::ApplicationDescription &description)
                     description.type, description.name));
   }
 
+  if (!is_application(type_id)) {
+    throw ModelBuildError(
+        fmt::format("Can't create application of non-application type \"{}\"",
+                    description.type));
+  }
+
   ns3::ObjectFactory factory;
   factory.SetTypeId(type_id);
 
@@ -37,20 +43,15 @@ auto Application::create(const parser::ApplicationDescription &description)
           R"(Unknown attribute "{}" of type "{}")", key, description.type));
     }
 
-    // TODO: handle attributes error
-    // auto val = info.initialValue->Copy();
-    // if (val->DeserializeFromString(value, info.checker) == false) {
-    //   throw ModelBuildError(
-    //       fmt::format(R"(Bad attribute value "{}" of attribute "{}" of
-    //       "{}")",
-    //                   value, key, description.type));
-    // }
-
-    // FIX: May occure deserialization errors
     factory.Set(key, ns3::StringValue(value));
   }
 
   auto app = factory.Create<ns3::Application>();
   return {app, description.name};
 }
+
+bool Application::is_application(const ns3::TypeId &app_type) noexcept {
+  return app_type.IsChildOf(ns3::Application::GetTypeId());
+}
+
 }  // namespace model
