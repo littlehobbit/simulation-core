@@ -3,7 +3,6 @@
 #include <stdexcept>
 
 #include <boost/asio/ip/address_v4.hpp>
-#include <boost/asio/ip/address_v6.hpp>
 
 #include <fmt/core.h>
 #include <ns3/node.h>
@@ -19,7 +18,6 @@
 #include <ns3/ipv4-address.h>
 #include <ns3/ipv4-static-routing-helper.h>
 #include <ns3/ipv4-static-routing.h>
-#include <ns3/ipv6-address.h>
 #include <ns3/ipv6-static-routing-helper.h>
 #include <ns3/ipv6-static-routing.h>
 
@@ -97,7 +95,7 @@ auto Node::create(const parser::NodeDescription &description) -> Node {
 
     auto interface = ret._ipv4->GetInterfaceForDevice(device);
     ipv4_static_routing->AddNetworkRouteTo(
-        ns3::Ipv4Address{ipv4_route.network.network().to_uint()},
+        address::to_ns3_v4(ipv4_route.network.network()),
         ns3::Ipv4Mask{ipv4_route.network.netmask().to_uint()}, interface,
         ipv4_route.metric);
   }
@@ -115,7 +113,7 @@ auto Node::create(const parser::NodeDescription &description) -> Node {
 
     auto interface = ret._ipv6->GetInterfaceForDevice(device);
     ipv6_static_routing->AddNetworkRouteTo(
-        ns3::Ipv6Address{ipv6_route.network.network().to_string().c_str()},
+        address::to_ns3_v6(ipv6_route.network.address()),
         ipv6_route.network.prefix_length(), interface, ipv6_route.metric);
   }
 
