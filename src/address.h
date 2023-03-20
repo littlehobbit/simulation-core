@@ -19,26 +19,6 @@
 
 namespace address {
 
-struct MacAddress {
-  static constexpr auto buffer_size = 6;
-  using buffer_t = std::array<uint8_t, buffer_size>;
-
-  MacAddress() = default;
-  MacAddress(const buffer_t &buffer) : buffer(buffer) {}
-
-  static std::optional<MacAddress> from_string(std::string_view str) noexcept;
-
-  bool operator==(const MacAddress &rhs) const {
-    return this->buffer == rhs.buffer;
-  }
-
-  bool operator==(const buffer_t &buffer) const {
-    return this->buffer == buffer;
-  }
-
-  buffer_t buffer = {0};
-};
-
 using Ipv4Network = boost::asio::ip::network_v4;
 using Ipv6Network = boost::asio::ip::network_v6;
 
