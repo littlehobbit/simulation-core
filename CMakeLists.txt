@@ -27,6 +27,7 @@ add_library(
   src/model/device.cpp
   src/model/node.cpp
   src/model/application.cpp
+  src/model/channel.cpp
 )
 
 target_include_directories(

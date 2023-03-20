@@ -270,7 +270,7 @@ auto XmlParser::parse_connections(const tinyxml2::XMLElement *model)
       auto id = connection.get_attribute<std::uint64_t>(id_attr);
 
       auto type = connection.get_attribute<std::string>(type_attr);
-      auto transformed_type = channel::from_string(type);
+      auto transformed_type = model::channel_from_string(type);
 
       // TODO: does it necessary to make checks here?
       if (!transformed_type.has_value()) {

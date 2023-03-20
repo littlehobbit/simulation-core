@@ -3,31 +3,34 @@
 #include <boost/asio/ip/address_v6.hpp>
 #include <boost/asio/ip/network_v4.hpp>
 
-#include <gtest/gtest.h>
 #include <ns3/attribute.h>
+#include <ns3/channel-list.h>
 #include <ns3/config.h>
+#include <ns3/csma-net-device.h>
+#include <ns3/ipv4-address.h>
+#include <ns3/ipv4-interface-address.h>
 #include <ns3/ipv4.h>
 #include <ns3/ipv6.h>
+#include <ns3/mac48-address.h>
 #include <ns3/names.h>
+#include <ns3/net-device.h>
+#include <ns3/node-list.h>
+#include <ns3/nstime.h>
 #include <ns3/object.h>
 #include <ns3/pointer.h>
 #include <ns3/string.h>
 #include <ns3/uinteger.h>
 
+#include <gtest/gtest.h>
+
 #include "address.h"
 #include "model/application.h"
+#include "model/channel.h"
 #include "model/device.h"
 #include "model/model.h"
 #include "model/model_build_error.h"
 #include "model/node.h"
 #include "parser/parser.h"
-#include <ns3/channel-list.h>
-#include <ns3/csma-net-device.h>
-#include <ns3/ipv4-address.h>
-#include <ns3/ipv4-interface-address.h>
-#include <ns3/mac48-address.h>
-#include <ns3/net-device.h>
-#include <ns3/node-list.h>
 
 template <typename AttributeType, typename ExpectedValue>
 void EXPECT_ATTRIBUTE_NE(ns3::Ptr<ns3::Object> object,
@@ -57,8 +60,10 @@ void EXPECT_ATTRIBUTE_EQ(ns3::Ptr<ns3::Object> object,
 
 TEST(Node, CreateNode) {  // NOLINT
 
-  parser::ApplicationDescription application_desc{.name = "Client",
-                                                  .type = "ns3::UdpEchoClient"};
+  parser::ApplicationDescription application_desc{
+      .name = "Client",
+      .type = "ns3::UdpEchoClient",
+      .attributes = {{"RemotePort", "6666"}}};
 
   parser::DeviceDescription device_desc{
       .name = "eth0",
@@ -114,6 +119,8 @@ TEST(Node, CreateNode) {  // NOLINT
 
   EXPECT_EQ(ns3::Names::FindName(app.get()), "Client");
   EXPECT_EQ(ns3::Names::FindPath(app.get()), "/Names/node/Client");
+
+  EXPECT_ATTRIBUTE_EQ<ns3::UintegerValue>(app.get(), "RemotePort", 6666);
 }
 
 TEST(Device, CreateCsmaDevice) {  // NOLINT
@@ -200,6 +207,48 @@ TEST(Application, CreateNonApplication) {  // NOLINT
   EXPECT_THROW(model::Application::create(descr), model::ModelBuildError);
 }
 
-// TEST(Model, ErrorOnDeviceWithoutQueue) {}
+TEST(Channel, Create) {  // NOLINT
+  parser::ConnectionDescription description = {
+      .name = "test-connection",
+      .type = model::channel_type::CSMA,
+      .attributes = {{"Delay", "100ms"}}};
 
-// TEST(Model, ErrorOnNameDuplication) {}
+  auto channel = model::Channel::create(description);
+
+  ASSERT_TRUE(channel.get() != nullptr);
+  EXPECT_EQ(ns3::Names::FindName(channel->get()), "test-connection");
+  EXPECT_EQ(ns3::Names::FindPath(channel->get()), "/Names/test-connection");
+
+  EXPECT_ATTRIBUTE_EQ<ns3::TimeValue>(channel->get(), "Delay",
+                                      ns3::Time("100ms"));
+
+  auto channels_count = ns3::ChannelList::GetNChannels();
+  ASSERT_TRUE(channels_count > 0);
+  EXPECT_EQ(ns3::ChannelList::GetChannel(channels_count - 1), channel->get());
+}
+
+TEST(Device, ConnectToChannel) {  // NOLINT
+  parser::DeviceDescription device_desc{
+      .name = "eth0",
+      .type = "Csma",
+      .ipv4_addresses = {boost::asio::ip::make_network_v4("10.10.10.1/16"),
+                         boost::asio::ip::make_network_v4("10.20.20.1/24")},
+      .ipv6_addresses = {boost::asio::ip::make_network_v6("dead:beef::1/16")},
+      .attributes = {{"Mtu", "442"},
+                     {"Address", "ab:cd:ef:01:02:03"},
+                     {"TxQueue", "ns3::DropTailQueue<Packet>"}}};
+
+  parser::ConnectionDescription channel_desc{.name = "from_eth0",
+                                             .type = model::channel_type::CSMA};
+
+  auto device = model::Device::create(device_desc);
+  auto channel = model::Channel::create(channel_desc);
+
+  device.attach(channel);
+
+  EXPECT_TRUE(device.get()->GetChannel() != nullptr);
+  EXPECT_TRUE(device.channel() != nullptr);
+
+  // NEED TO FIND ALL DEVICES WRAPPERS FOR /{node}/{interface_name}
+  // Maybe add DeviceStorage::find() for this
+}

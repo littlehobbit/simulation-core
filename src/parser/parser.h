@@ -11,7 +11,7 @@
 #include <vector>
 
 #include "address.h"
-#include "channel.h"
+#include "model/channel.h"
 
 namespace tinyxml2 {
 class XMLElement;
@@ -66,7 +66,7 @@ struct NodeDescription {
 struct ConnectionDescription {
   std::uint64_t id;
   std::string name;
-  channel::type type;
+  model::channel_type type;
   std::vector<std::string> interfaces;
   Attributes attributes;
 };

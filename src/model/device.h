@@ -21,10 +21,13 @@ struct DeviceDescription;
 
 namespace model {
 
+class Channel;
+
 enum class device_type { Undedined, CSMA, PPP };
 
 class Device {
  public:
+  //  TODO: return shared-ptr
   static Device create(const parser::DeviceDescription& description);
 
   auto get() const -> ns3::Ptr<ns3::NetDevice> { return _device; }
@@ -39,13 +42,21 @@ class Device {
     return _ipv6_addresses;
   }
 
+  void attach(std::shared_ptr<Channel> channel);
+
+  auto channel() const -> std::shared_ptr<Channel> { return _attached_channel; }
+
  private:
   Device(const ns3::Ptr<ns3::NetDevice>& device, std::string name,
-         std::vector<ns3::Ipv4InterfaceAddress> ipv4,
+         device_type type, std::vector<ns3::Ipv4InterfaceAddress> ipv4,
          std::vector<ns3::Ipv6InterfaceAddress> ipv6);
 
   std::string _name;
+  device_type _type;
   ns3::Ptr<ns3::NetDevice> _device;
+
+  std::shared_ptr<Channel> _attached_channel;
+
   std::vector<ns3::Ipv4InterfaceAddress> _ipv4_addresses;
   std::vector<ns3::Ipv6InterfaceAddress> _ipv6_addresses;
 };

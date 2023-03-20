@@ -44,6 +44,7 @@ auto Application::create(const parser::ApplicationDescription &description)
           R"(Unknown attribute "{}" of type "{}")", key, description.type));
     }
 
+    // TODO: use Object::SetAttributeFailSafe
     factory.Set(key, ns3::StringValue(value));
   }
 

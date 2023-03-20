@@ -6,7 +6,7 @@
 #include <gtest/gtest.h>
 #include <tinyxml2.h>
 
-#include "channel.h"
+#include "model/channel.h"
 #include "parser/parse_util.h"
 #include "parser/parser.h"
 
@@ -164,7 +164,7 @@ TEST(XmlParse, ReadsConnections) {  // NOLINT
 
   const auto& connection = result.connections.front();
   EXPECT_EQ(connection.name, "test");
-  EXPECT_EQ(connection.type, channel::type::Csma);
+  EXPECT_EQ(connection.type, model::channel_type::CSMA);
   EXPECT_EQ(connection.interfaces, (std::vector<std::string>{"eth0", "eth1"}));
 
   ASSERT_EQ(connection.attributes.at("Key"), "Value");

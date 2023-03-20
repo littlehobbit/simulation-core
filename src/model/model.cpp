@@ -22,7 +22,11 @@ namespace model {
 
 void Model::build_from_description(
     const parser::ModelDescription &description) {
-  // TODO: not yet implemented
+  // TODO: create nodes
+
+  
+
+  // TODO: create connections
 }
 
 }  // namespace model

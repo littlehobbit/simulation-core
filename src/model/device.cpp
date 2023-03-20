@@ -4,11 +4,13 @@
 #include <utility>
 
 #include <ns3/address.h>
+#include <ns3/csma-channel.h>
 #include <ns3/csma-net-device.h>
 #include <ns3/ipv4-interface-address.h>
 #include <ns3/mac48-address.h>
 #include <ns3/net-device.h>
 #include <ns3/object.h>
+#include <ns3/point-to-point-channel.h>
 #include <ns3/point-to-point-net-device.h>
 #include <ns3/string.h>
 
@@ -21,10 +23,11 @@
 namespace model {
 
 Device::Device(const ns3::Ptr<ns3::NetDevice> &device, std::string name,
-               std::vector<ns3::Ipv4InterfaceAddress> ipv4,
+               device_type type, std::vector<ns3::Ipv4InterfaceAddress> ipv4,
                std::vector<ns3::Ipv6InterfaceAddress> ipv6)
     : _name{std::move(name)},
       _device{device},
+      _type{type},
       _ipv4_addresses{std::move(ipv4)},
       _ipv6_addresses{std::move(ipv6)} {}
 
@@ -58,6 +61,24 @@ Device Device::create(const parser::DeviceDescription &description) {
     ipv6.emplace_back(address::to_ns3_v6(ip));
   }
 
-  return {device, description.name, std::move(ipv4), std::move(ipv6)};
+  return {device, description.name, *type, std::move(ipv4), std::move(ipv6)};
 }
+
+void Device::attach(std::shared_ptr<Channel> channel) {
+  if (_type == device_type::CSMA && channel->type() == channel_type::CSMA) {
+    auto csma_device = _device->GetObject<ns3::CsmaNetDevice>();
+    auto csma_channel = channel->get()->GetObject<ns3::CsmaChannel>();
+    csma_device->Attach(csma_channel);
+  } else if (_type == device_type::PPP &&
+             channel->type() == channel_type::PPP) {
+    auto ppp_device = _device->GetObject<ns3::PointToPointNetDevice>();
+    auto ppp_channel = channel->get()->GetObject<ns3::PointToPointChannel>();
+    ppp_device->Attach(ppp_channel);
+  } else {
+    // TODO: throw error as nonacceptable device/channel
+  }
+
+  _attached_channel = channel;
+}
+
 };  // namespace model
