@@ -24,7 +24,7 @@ target_link_libraries(
   GTest::Main
   gmock
 
-  # FIX: fix for loading static type information in run-time
+  # FIX: fix for loading static type information on start-up
   ${LIB_AS_NEEDED_PRE}
   ${NS3_LIBS}
   ${LIB_AS_NEEDED_POST}

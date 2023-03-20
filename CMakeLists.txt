@@ -59,7 +59,7 @@ target_link_libraries(
   ${PROJECT_NAME}_lib
   CLI11::CLI11
 
-  # FIX: fix for loading static type information in run-time
+  # FIX: fix for loading static type information on start-up
   ${LIB_AS_NEEDED_PRE}
   ${NS3_LIBS}
   ${LIB_AS_NEEDED_POST}
