@@ -48,6 +48,7 @@ constexpr auto file_attr = "file";
 constexpr auto source_attr = "source";
 constexpr auto start_attr = "start";
 constexpr auto end_attr = "end";
+constexpr auto value_name_attr = "value_name";
 
 using util::get_attribute;
 using util::xml_element_range;
@@ -144,10 +145,10 @@ auto XmlParser::parse_devices(const tinyxml2::XMLElement *node)
 }
 
 auto XmlParser::parse_addresses(const tinyxml2::XMLElement *device)
-    -> std::pair<std::vector<address::Ipv4Network>,
-                 std::vector<address::Ipv6Network>> {
-  std::vector<address::Ipv4Network> ipv4;
-  std::vector<address::Ipv6Network> ipv6;
+    -> std::pair<std::vector<address::network_v4>,
+                 std::vector<address::network_v6>> {
+  std::vector<address::network_v4> ipv4;
+  std::vector<address::network_v6> ipv6;
 
   for (const auto &address_iter : xml_element_range(device, address_tag)) {
     auto value = address_iter.get_attribute<std::string>(value_attr);
@@ -328,9 +329,13 @@ auto XmlParser::parse_statistics(const tinyxml2::XMLElement *root)
     std::optional<std::string> end_time =
         end_time_val.empty() ? std::nullopt : std::optional{end_time_val};
 
+    auto value_name =
+        registrator.get_attribute<std::string>(value_name_attr, false, "value");
+
     registrators.push_back(
         RegistratorDescription{.source = std::move(source),
                                .type = std::move(type),
+                               .value_name = std::move(value_name),
                                .file = std::move(file),
                                .start_time = std::move(start_time),
                                .end_time = end_time});

@@ -1,5 +1,7 @@
 #include "channel.h"
 
+#include <map>
+
 #include <ns3/channel.h>
 #include <ns3/csma-channel.h>
 #include <ns3/object.h>
@@ -7,6 +9,9 @@
 #include <ns3/point-to-point-net-device.h>
 #include <ns3/string.h>
 
+#include <fmt/core.h>
+
+#include "model/model_build_error.h"
 #include "model/name_service.h"
 #include "parser/parser.h"
 
@@ -22,7 +27,10 @@ auto Channel::create(const parser::ConnectionDescription &description)
   }
 
   for (const auto &[key, value] : description.attributes) {
-    channel->SetAttributeFailSafe(key, ns3::StringValue(value));
+    if (!channel->SetAttributeFailSafe(key, ns3::StringValue{value})) {
+      throw ModelBuildError(fmt::format(
+          R"(Failed set attribute "{}" with value "{}")", key, value));
+    }
   }
 
   names::add(channel, description.name);

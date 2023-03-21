@@ -2,6 +2,7 @@
 #define __DEVICE_H_D9MGWIE9T1CE__
 
 #include <algorithm>
+#include <memory>
 #include <optional>
 #include <string>
 #include <vector>
@@ -42,7 +43,7 @@ class Device {
     return _ipv6_addresses;
   }
 
-  void attach(std::shared_ptr<Channel> channel);
+  void attach(const std::shared_ptr<Channel> &channel);
 
   auto channel() const -> std::shared_ptr<Channel> { return _attached_channel; }
 

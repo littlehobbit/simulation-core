@@ -107,12 +107,12 @@ TEST(XmlParse, ReadingNode) {  // NOLINT
 
   ASSERT_EQ(device.ipv4_addresses.size(), 1);
   EXPECT_EQ(device.ipv4_addresses.front().address(),
-            boost::asio::ip::make_address_v4("10.1.22.222"));
+            asio::ip::make_address_v4("10.1.22.222"));
   EXPECT_EQ(device.ipv4_addresses.front().prefix_length(), 24);
 
   ASSERT_EQ(device.ipv6_addresses.size(), 1);
   EXPECT_EQ(device.ipv6_addresses.front().address(),
-            boost::asio::ip::make_address_v6("2022:dead:beef:2023::1"));
+            asio::ip::make_address_v6("2022:dead:beef:2023::1"));
   EXPECT_EQ(device.ipv6_addresses.front().prefix_length(), 64);
 
   ASSERT_FALSE(device.attributes.empty());
@@ -181,6 +181,7 @@ TEST(XmlParse, ReadsRegistrators) {  // NOLINT
             <registrator source="test-source"
                type="TestType"
                file="test-1"
+               value_name="CWND"
                start="0s"/>
 
               <registrator source="test-source"
@@ -201,6 +202,7 @@ TEST(XmlParse, ReadsRegistrators) {  // NOLINT
   EXPECT_EQ(first.file, "test-1");
   EXPECT_EQ(first.start_time, "0s");
   EXPECT_FALSE(first.end_time.has_value());
+  EXPECT_EQ(first.value_name, "CWND");
 
   auto& second = result.registrators[1];
   EXPECT_EQ(second.source, "test-source");
@@ -208,6 +210,7 @@ TEST(XmlParse, ReadsRegistrators) {  // NOLINT
   EXPECT_EQ(second.file, "test-2");
   EXPECT_EQ(second.start_time, "0s");
   EXPECT_EQ(second.end_time, "2s");
+  EXPECT_EQ(second.value_name, "value");  // by default
 }
 
 TEST(XmlParse, IncorrectNodeReading) {  // NOLINT

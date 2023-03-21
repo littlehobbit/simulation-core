@@ -26,8 +26,8 @@ struct DeviceDescription {
   std::string name;
   std::string type;
 
-  std::vector<address::Ipv4Network> ipv4_addresses;
-  std::vector<address::Ipv6Network> ipv6_addresses;
+  std::vector<address::network_v4> ipv4_addresses;
+  std::vector<address::network_v6> ipv6_addresses;
 
   Attributes attributes;
 };
@@ -39,13 +39,13 @@ struct ApplicationDescription {
 };
 
 struct Ipv4Route {
-  address::Ipv4Network network;
+  address::network_v4 network;
   std::string interface;
   std::uint8_t metric;
 };
 
 struct Ipv6Route {
-  address::Ipv6Network network;
+  address::network_v6 network;
   std::string interface;
   std::uint8_t metric;
 };
@@ -74,6 +74,7 @@ struct ConnectionDescription {
 struct RegistratorDescription {
   std::string source;
   std::string type;
+  std::string value_name;
   std::string file;
   std::string start_time;
   std::optional<std::string> end_time;
@@ -119,8 +120,8 @@ class XmlParser {
       -> std::vector<DeviceDescription>;
 
   auto parse_addresses(const tinyxml2::XMLElement *device)
-      -> std::pair<std::vector<address::Ipv4Network>,
-                   std::vector<address::Ipv6Network>>;
+      -> std::pair<std::vector<address::network_v4>,
+                   std::vector<address::network_v6>>;
 
   auto parse_attributes(const tinyxml2::XMLElement *element) -> Attributes;
 

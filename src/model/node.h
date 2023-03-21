@@ -3,18 +3,22 @@
 
 #include <cstddef>
 #include <map>
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include <ns3/ipv4.h>
 #include <ns3/ipv6.h>
-#include <ns3/net-device.h>
 #include <ns3/node.h>
 #include <ns3/ptr.h>
 
 #include "application.h"
 #include "device.h"
+
+namespace ns3 {
+class NetDevice;
+}
 
 namespace parser {
 struct NodeDescription;
@@ -40,22 +44,22 @@ class Node {
 
   auto ipv6() const -> ns3::Ptr<ns3::Ipv6> { return _ipv6; }
 
-  static Node create(const parser::NodeDescription &description);
+  auto name() const -> const std::string & { return _name; }
+
+  static auto create(const parser::NodeDescription &description)
+      -> std::unique_ptr<Node>;
+
+  auto get_device_by_name(const std::string &name) -> Device *;
 
  private:
-  Node(const ns3::Ptr<ns3::Node> &node) : _node{node} {}
+  Node(const ns3::Ptr<ns3::Node> &node, std::string name)
+      : _name{std::move(name)}, _node{node} {}
 
   void attach(Device &&device);
 
   void attach(Application &&app);
 
-  auto get_device_by_name(const std::string &name) -> ns3::Ptr<ns3::NetDevice> {
-    if (auto it = _device_per_name.find(name); it != _device_per_name.cend()) {
-      return it->second;
-    }
-    return nullptr;
-  }
-
+  std::string _name;
   ns3::Ptr<ns3::Node> _node;
   std::vector<Device> _devices;
   std::vector<Application> _applications;

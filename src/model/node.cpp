@@ -1,5 +1,6 @@
 #include "node.h"
 
+#include <algorithm>
 #include <stdexcept>
 
 #include <boost/asio/ip/address_v4.hpp>
@@ -10,6 +11,7 @@
 #include <ns3/ipv4-static-routing.h>
 #include <ns3/ipv6-static-routing-helper.h>
 #include <ns3/ipv6-static-routing.h>
+#include <ns3/net-device.h>
 #include <ns3/node.h>
 #include <ns3/object.h>
 
@@ -63,7 +65,8 @@ void Node::attach(Application &&app) {
   _applications.push_back(std::move(app));
 }
 
-auto Node::create(const parser::NodeDescription &description) -> Node {
+auto Node::create(const parser::NodeDescription &description)
+    -> std::unique_ptr<Node> {
   auto node = ns3::CreateObject<ns3::Node>();
   ns3::InternetStackHelper stack;
   stack.Install(node);
@@ -71,30 +74,30 @@ auto Node::create(const parser::NodeDescription &description) -> Node {
 
   // TODO: set internet protocols settings
 
-  Node ret{node};
-  ret._ipv4 = node->GetObject<ns3::Ipv4>();
-  ret._ipv6 = node->GetObject<ns3::Ipv6>();
+  auto ret = std::unique_ptr<Node>(new Node{node, description.name});
+  ret->_ipv4 = node->GetObject<ns3::Ipv4>();
+  ret->_ipv6 = node->GetObject<ns3::Ipv6>();
 
   for (const auto &device_desc : description.devices) {
-    ret.attach(Device::create(device_desc));
+    ret->attach(Device::create(device_desc));
   }
 
   for (const auto &app_desc : description.applications) {
-    ret.attach(Application::create(app_desc));
+    ret->attach(Application::create(app_desc));
   }
 
   // IPv4 routing
   auto ipv4_static_routing =
-      ns3::Ipv4StaticRoutingHelper().GetStaticRouting(ret._ipv4);
+      ns3::Ipv4StaticRoutingHelper().GetStaticRouting(ret->_ipv4);
 
   for (const auto &ipv4_route : description.routing.ipv4) {
-    auto device = ret.get_device_by_name(ipv4_route.interface);
+    auto *device = ret->get_device_by_name(ipv4_route.interface);
     if (device == nullptr) {
       throw ModelBuildError(fmt::format("Can't find interface \"{}\" for route",
                                         ipv4_route.interface));
     }
 
-    auto interface = ret._ipv4->GetInterfaceForDevice(device);
+    auto interface = ret->_ipv4->GetInterfaceForDevice(device->get());
     ipv4_static_routing->AddNetworkRouteTo(
         address::to_ns3_v4(ipv4_route.network.network()),
         ns3::Ipv4Mask{ipv4_route.network.netmask().to_uint()}, interface,
@@ -103,22 +106,34 @@ auto Node::create(const parser::NodeDescription &description) -> Node {
 
   // IPv6 routing
   ns3::Ipv6StaticRoutingHelper ipv6_helper;
-  auto ipv6_static_routing = ipv6_helper.GetStaticRouting(ret._ipv6);
+  auto ipv6_static_routing = ipv6_helper.GetStaticRouting(ret->_ipv6);
 
   for (const auto &ipv6_route : description.routing.ipv6) {
-    auto device = ret.get_device_by_name(ipv6_route.interface);
+    auto *device = ret->get_device_by_name(ipv6_route.interface);
     if (device == nullptr) {
       throw ModelBuildError(fmt::format("Can't find interface \"{}\" for route",
                                         ipv6_route.interface));
     }
 
-    auto interface = ret._ipv6->GetInterfaceForDevice(device);
+    auto interface = ret->_ipv6->GetInterfaceForDevice(device->get());
     ipv6_static_routing->AddNetworkRouteTo(
         address::to_ns3_v6(ipv6_route.network.address()),
         ipv6_route.network.prefix_length(), interface, ipv6_route.metric);
   }
 
   return ret;
+}
+
+auto Node::get_device_by_name(const std::string &name) -> Device * {
+  auto res = std::find_if(
+      _devices.begin(), _devices.end(),
+      [&name](const auto &device) { return device.name() == name; });
+
+  if (res != _devices.end()) {
+    return res.base();
+  }
+
+  return nullptr;
 }
 
 }  // namespace model

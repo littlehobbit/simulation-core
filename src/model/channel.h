@@ -1,10 +1,14 @@
 #ifndef __CHANNEL_H_5R0UZOSTZ1NM__
 #define __CHANNEL_H_5R0UZOSTZ1NM__
 
+#include <memory>
 #include <optional>
+#include <string>
 #include <string_view>
+#include <utility>
 
 #include <ns3/channel.h>
+#include <ns3/ptr.h>
 
 namespace parser {
 struct ConnectionDescription;
@@ -22,6 +26,8 @@ class Channel {
   auto get() const -> ns3::Ptr<ns3::Channel> { return _channel; }
 
   auto type() const -> channel_type { return _type; }
+
+  auto name() const -> const std::string & { return _name; }
 
  private:
   Channel(const ns3::Ptr<ns3::Channel> &channel, std::string name,

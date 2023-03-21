@@ -17,28 +17,31 @@
 #include <ns3/ipv6-interface-address.h>
 #include <ns3/ipv6-interface.h>
 
+namespace asio = boost::asio;
+
 namespace address {
 
-using Ipv4Network = boost::asio::ip::network_v4;
-using Ipv6Network = boost::asio::ip::network_v6;
+using address_v4 = asio::ip::address_v4;
+using network_v4 = asio::ip::network_v4;
 
-inline auto to_ns3_v4(const boost::asio::ip::address_v4 &address) noexcept
-    -> ns3::Ipv4Address {
+using address_v6 = asio::ip::address_v6;
+using network_v6 = asio::ip::network_v6;
+
+inline auto to_ns3_v4(const address_v4 &address) noexcept -> ns3::Ipv4Address {
   return ns3::Ipv4Address{address.to_uint()};
 }
 
-inline auto to_ns3_v4(const boost::asio::ip::network_v4 &network) noexcept
+inline auto to_ns3_v4(const network_v4 &network) noexcept
     -> ns3::Ipv4InterfaceAddress {
   return {to_ns3_v4(network.address()),
           ns3::Ipv4Mask{network.netmask().to_uint()}};
 }
 
-inline auto to_ns3_v6(const boost::asio::ip::address_v6 &address) noexcept
-    -> ns3::Ipv6Address {
+inline auto to_ns3_v6(const address_v6 &address) noexcept -> ns3::Ipv6Address {
   return ns3::Ipv6Address{address.to_bytes().data()};
 }
 
-inline auto to_ns3_v6(const boost::asio::ip::network_v6 &network) noexcept
+inline auto to_ns3_v6(const network_v6 &network) noexcept
     -> ns3::Ipv6InterfaceAddress {
   return ns3::Ipv6InterfaceAddress{
       to_ns3_v6(network.address()),
@@ -47,11 +50,10 @@ inline auto to_ns3_v6(const boost::asio::ip::network_v6 &network) noexcept
 
 inline auto from_string_v4(std::string_view address,
                            std::string_view mask) noexcept
-    -> std::optional<Ipv4Network> {
+    -> std::optional<network_v4> {
   try {
-    return boost::asio::ip::make_network_v4(
-        boost::asio::ip::make_address_v4(address),
-        boost::asio::ip::make_address_v4(mask));
+    return asio::ip::make_network_v4(asio::ip::make_address_v4(address),
+                                     asio::ip::make_address_v4(mask));
   } catch (...) {
     return {};
   }
@@ -59,10 +61,10 @@ inline auto from_string_v4(std::string_view address,
 
 inline auto from_string_v6(std::string_view address,
                            std::uint8_t prefix) noexcept
-    -> std::optional<Ipv6Network> {
+    -> std::optional<network_v6> {
   try {
-    return boost::asio::ip::make_network_v6(
-        boost::asio::ip::make_address_v6(address), prefix);
+    return asio::ip::make_network_v6(asio::ip::make_address_v6(address),
+                                     prefix);
   } catch (...) {
     return {};
   }

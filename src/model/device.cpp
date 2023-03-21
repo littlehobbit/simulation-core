@@ -4,6 +4,7 @@
 #include <utility>
 
 #include <ns3/address.h>
+#include <ns3/channel.h>
 #include <ns3/csma-channel.h>
 #include <ns3/csma-net-device.h>
 #include <ns3/ipv4-interface-address.h>
@@ -17,6 +18,7 @@
 #include <fmt/core.h>
 
 #include "address.h"
+#include "model/channel.h"
 #include "model_build_error.h"
 #include "parser/parser.h"
 
@@ -64,7 +66,7 @@ Device Device::create(const parser::DeviceDescription &description) {
   return {device, description.name, *type, std::move(ipv4), std::move(ipv6)};
 }
 
-void Device::attach(std::shared_ptr<Channel> channel) {
+void Device::attach(const std::shared_ptr<Channel> &channel) {
   if (_type == device_type::CSMA && channel->type() == channel_type::CSMA) {
     auto csma_device = _device->GetObject<ns3::CsmaNetDevice>();
     auto csma_channel = channel->get()->GetObject<ns3::CsmaChannel>();
@@ -75,7 +77,8 @@ void Device::attach(std::shared_ptr<Channel> channel) {
     auto ppp_channel = channel->get()->GetObject<ns3::PointToPointChannel>();
     ppp_device->Attach(ppp_channel);
   } else {
-    // TODO: throw error as nonacceptable device/channel
+    throw ModelBuildError(fmt::format(
+        R"(Can't attach channel "{}" to device "{}")", channel->name(), _name));
   }
 
   _attached_channel = channel;

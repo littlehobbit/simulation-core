@@ -29,6 +29,7 @@
 #include "model/device.h"
 #include "model/model.h"
 #include "model/model_build_error.h"
+#include "model/name_service.h"
 #include "model/node.h"
 #include "parser/parser.h"
 
@@ -68,9 +69,9 @@ TEST(Node, CreateNode) {  // NOLINT
   parser::DeviceDescription device_desc{
       .name = "eth0",
       .type = "Csma",
-      .ipv4_addresses = {boost::asio::ip::make_network_v4("10.10.10.1/16"),
-                         boost::asio::ip::make_network_v4("10.20.20.1/24")},
-      .ipv6_addresses = {boost::asio::ip::make_network_v6("dead:beef::1/16")},
+      .ipv4_addresses = {asio::ip::make_network_v4("10.10.10.1/16"),
+                         asio::ip::make_network_v4("10.20.20.1/24")},
+      .ipv6_addresses = {asio::ip::make_network_v6("dead:beef::1/16")},
       .attributes = {{"Mtu", "442"},
                      {"Address", "ab:cd:ef:01:02:03"},
                      {"TxQueue", "ns3::DropTailQueue<Packet>"}}};
@@ -81,41 +82,41 @@ TEST(Node, CreateNode) {  // NOLINT
 
   auto node = model::Node::create(node_desc);
 
-  EXPECT_EQ(ns3::Names::FindName(node.get()), "node");
-  EXPECT_TRUE(node.get()->GetObject<ns3::Ipv4>() != nullptr);
-  EXPECT_TRUE(node.get()->GetObject<ns3::Ipv6>() != nullptr);
+  EXPECT_EQ(ns3::Names::FindName(node->get()), "node");
+  EXPECT_TRUE(node->get()->GetObject<ns3::Ipv4>() != nullptr);
+  EXPECT_TRUE(node->get()->GetObject<ns3::Ipv6>() != nullptr);
 
-  ASSERT_EQ(node.devices_count(), 1);
-  const auto& device = node.get_device(0);
+  ASSERT_EQ(node->devices_count(), 1);
+  const auto& device = node->get_device(0);
 
   // Node by default has loopback net-device at index 0
-  EXPECT_EQ(node.devices_count(), node.get()->GetNDevices() - 1);
-  EXPECT_EQ(device.get(), node.get()->GetDevice(1));
+  EXPECT_EQ(node->devices_count(), node->get()->GetNDevices() - 1);
+  EXPECT_EQ(device.get(), node->get()->GetDevice(1));
 
   EXPECT_EQ(ns3::Names::FindPath(device.get()), "/Names/node/eth0");
   EXPECT_EQ(ns3::Names::FindName(device.get()), "eth0");
 
   // IPv4 addresses
-  ASSERT_EQ(node.devices_count(), node.ipv4()->GetNInterfaces() - 1);
-  ASSERT_EQ(device.ipv4_addresses().size(), node.ipv4()->GetNAddresses(1));
+  ASSERT_EQ(node->devices_count(), node->ipv4()->GetNInterfaces() - 1);
+  ASSERT_EQ(device.ipv4_addresses().size(), node->ipv4()->GetNAddresses(1));
 
-  ASSERT_EQ(node.ipv4()->GetNAddresses(1), 2);
-  EXPECT_EQ(device.ipv4_addresses().at(0), node.ipv4()->GetAddress(1, 0));
-  EXPECT_EQ(device.ipv4_addresses().at(1), node.ipv4()->GetAddress(1, 1));
+  ASSERT_EQ(node->ipv4()->GetNAddresses(1), 2);
+  EXPECT_EQ(device.ipv4_addresses().at(0), node->ipv4()->GetAddress(1, 0));
+  EXPECT_EQ(device.ipv4_addresses().at(1), node->ipv4()->GetAddress(1, 1));
 
   // IPv6 addresses
-  ASSERT_EQ(node.devices_count(), node.ipv6()->GetNInterfaces() - 1);
-  ASSERT_EQ(device.ipv6_addresses().size(), node.ipv6()->GetNAddresses(1));
+  ASSERT_EQ(node->devices_count(), node->ipv6()->GetNInterfaces() - 1);
+  ASSERT_EQ(device.ipv6_addresses().size(), node->ipv6()->GetNAddresses(1));
 
-  ASSERT_EQ(node.ipv6()->GetNAddresses(1), 1);
-  EXPECT_EQ(device.ipv6_addresses().at(0), node.ipv6()->GetAddress(1, 0));
+  ASSERT_EQ(node->ipv6()->GetNAddresses(1), 1);
+  EXPECT_EQ(device.ipv6_addresses().at(0), node->ipv6()->GetAddress(1, 0));
 
   // Applications
-  ASSERT_EQ(node.applications().size(), 1);
-  ASSERT_EQ(node.get()->GetNApplications(), 1);
+  ASSERT_EQ(node->applications().size(), 1);
+  ASSERT_EQ(node->get()->GetNApplications(), 1);
 
-  const auto& app = node.applications().at(0);
-  EXPECT_EQ(app.get(), node.get()->GetApplication(0));
+  const auto& app = node->applications().at(0);
+  EXPECT_EQ(app.get(), node->get()->GetApplication(0));
 
   EXPECT_EQ(ns3::Names::FindName(app.get()), "Client");
   EXPECT_EQ(ns3::Names::FindPath(app.get()), "/Names/node/Client");
@@ -127,9 +128,9 @@ TEST(Device, CreateCsmaDevice) {  // NOLINT
   parser::DeviceDescription desc{
       .name = "eth0",
       .type = "Csma",
-      .ipv4_addresses = {boost::asio::ip::make_network_v4("10.10.10.1/16"),
-                         boost::asio::ip::make_network_v4("10.20.20.1/24")},
-      .ipv6_addresses = {boost::asio::ip::make_network_v6("dead:beef::1/16")},
+      .ipv4_addresses = {asio::ip::make_network_v4("10.10.10.1/16"),
+                         asio::ip::make_network_v4("10.20.20.1/24")},
+      .ipv6_addresses = {asio::ip::make_network_v6("dead:beef::1/16")},
       .attributes = {{"Mtu", "442"},
                      {"Address", "ab:cd:ef:01:02:03"},
                      {"TxQueue", "ns3::DropTailQueue<Packet>"}}};
@@ -227,13 +228,22 @@ TEST(Channel, Create) {  // NOLINT
   EXPECT_EQ(ns3::ChannelList::GetChannel(channels_count - 1), channel->get());
 }
 
+TEST(Channel, BadAttribute) {  // NOLINT
+  parser::ConnectionDescription description = {
+      .name = "test-connection",
+      .type = model::channel_type::CSMA,
+      .attributes = {{"Del_ay", "100__ms"}}};
+
+  EXPECT_THROW(model::Channel::create(description), model::ModelBuildError);
+}
+
 TEST(Device, ConnectToChannel) {  // NOLINT
   parser::DeviceDescription device_desc{
       .name = "eth0",
       .type = "Csma",
-      .ipv4_addresses = {boost::asio::ip::make_network_v4("10.10.10.1/16"),
-                         boost::asio::ip::make_network_v4("10.20.20.1/24")},
-      .ipv6_addresses = {boost::asio::ip::make_network_v6("dead:beef::1/16")},
+      .ipv4_addresses = {asio::ip::make_network_v4("10.10.10.1/16"),
+                         asio::ip::make_network_v4("10.20.20.1/24")},
+      .ipv6_addresses = {asio::ip::make_network_v6("dead:beef::1/16")},
       .attributes = {{"Mtu", "442"},
                      {"Address", "ab:cd:ef:01:02:03"},
                      {"TxQueue", "ns3::DropTailQueue<Packet>"}}};
@@ -251,4 +261,114 @@ TEST(Device, ConnectToChannel) {  // NOLINT
 
   // NEED TO FIND ALL DEVICES WRAPPERS FOR /{node}/{interface_name}
   // Maybe add DeviceStorage::find() for this
+
+  model::names::cleanup();
+}
+
+TEST(Device, ErrorOnBadTypes) {  // NOLINT
+  parser::DeviceDescription device_desc{
+      .name = "eth0",
+      .type = "PPP",
+      .ipv4_addresses = {asio::ip::make_network_v4("10.10.10.1/16"),
+                         asio::ip::make_network_v4("10.20.20.1/24")},
+      .ipv6_addresses = {asio::ip::make_network_v6("dead:beef::1/16")},
+      .attributes = {{"Mtu", "442"},
+                     {"Address", "ab:cd:ef:01:02:03"},
+                     {"TxQueue", "ns3::DropTailQueue<Packet>"}}};
+
+  parser::ConnectionDescription channel_desc{.name = "from_eth0",
+                                             .type = model::channel_type::CSMA};
+
+  auto device = model::Device::create(device_desc);
+  auto channel = model::Channel::create(channel_desc);
+
+  EXPECT_THROW(device.attach(channel), model::ModelBuildError);
+
+  model::names::cleanup();
+}
+
+TEST(Model, Build) {  // NOLINT
+  parser::NodeDescription node_a_desc = {
+      .name = "node_a",
+      .devices = {parser::DeviceDescription{
+          .name = "eth0",
+          .type = "PPP",
+          .ipv4_addresses = {asio::ip::make_network_v4("10.10.10.2/24")}}}};
+
+  parser::NodeDescription node_b_desc = {
+      .name = "node_b",
+      .devices = {parser::DeviceDescription{
+          .name = "eth0",
+          .type = "PPP",
+          .ipv4_addresses = {asio::ip::make_network_v4("10.10.10.4/24")}}}};
+
+  parser::ConnectionDescription connection = {
+      .name = "a_to_b",
+      .type = model::channel_type::PPP,
+      .interfaces = {"node_a/eth0", "node_b/eth0"}};
+
+  parser::ModelDescription model_desc = {
+      .model_name = "model",                //
+      .nodes = {node_a_desc, node_b_desc},  //
+      .connections = {connection}};
+
+  model::Model model;
+  model.build_from_description(model_desc);
+
+  auto* node_a = model.find_node(node_a_desc.name);
+  ASSERT_TRUE(node_a != nullptr);
+  EXPECT_TRUE(node_a->get_device(0).channel() != nullptr);
+  EXPECT_TRUE(node_a->get_device(0).channel() != nullptr);
+  EXPECT_TRUE(node_a->get_device(0).get()->GetChannel() != nullptr);
+
+  auto* node_b = model.find_node(node_b_desc.name);
+  ASSERT_TRUE(node_b != nullptr);
+  EXPECT_TRUE(node_b->get_device(0).channel() != nullptr);
+  EXPECT_TRUE(node_b->get_device(0).channel() != nullptr);
+  EXPECT_TRUE(node_b->get_device(0).get()->GetChannel() != nullptr);
+
+  model::names::cleanup();
+}
+
+TEST(Model, BadIterfaces) {  // NOLINT
+  parser::NodeDescription node_a_desc = {
+      .name = "node_a",
+      .devices = {parser::DeviceDescription{
+          .name = "eth0",
+          .type = "PPP",
+          .ipv4_addresses = {asio::ip::make_network_v4("10.10.10.2/24")}}}};
+
+  parser::NodeDescription node_b_desc = {
+      .name = "node_b",
+      .devices = {parser::DeviceDescription{
+          .name = "eth0",
+          .type = "PPP",
+          .ipv4_addresses = {asio::ip::make_network_v4("10.10.10.4/24")}}}};
+
+  parser::ModelDescription model_desc = {
+      .model_name = "model",                //
+      .nodes = {node_a_desc, node_b_desc},  //
+  };
+
+  {
+    model::Model model;
+    model_desc.connections = {
+        {.name = "a_to_b",
+         .type = model::channel_type::PPP,
+         .interfaces = {"UNKNOWN_NAME/eth0", "node_b/eth0"}}};
+    EXPECT_THROW(model.build_from_description(model_desc),
+                 model::ModelBuildError);
+    model::names::cleanup();
+  }
+
+  {
+    model::Model model;
+    model_desc.connections = {
+        {.name = "a_to_b",
+         .type = model::channel_type::PPP,
+         .interfaces = {"node_a/eth0", "node_b/INTERFACE"}}};
+    EXPECT_THROW(model.build_from_description(model_desc),
+                 model::ModelBuildError);
+    model::names::cleanup();
+  }
 }
