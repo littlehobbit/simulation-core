@@ -218,10 +218,11 @@
 <!-- TODO: Описывать атрибуты регистратора?  -->
 ```xml
 <statistics>
-  <registrator source="node-a/$ns3::TcpL4Protocol/SocketList/0/CongestionWindow"
-               type="UintegerRegistrator"
+  <registrator source="/Names/node-a/$ns3::TcpL4Protocol/SocketList/0/CongestionWindow"
+               type="ns3::Uinteger32Probe"
                file="node-a-cwnd"
-               start="0s"
+               value_name="cwnd"
+               start="1s"
                end="10s"/>
 </statistics>
 ```
@@ -260,7 +261,7 @@
 
     <node id="1" name="Server">
       <device-list>
-        <device id="0" name="eth0">
+        <device id="0" name="eth0" type="Csma">
           <address value="10.01.22.2" netmask="255.255.255.0"/>
             <attribures>
               <attribute key="Mtu" value="1200"/>
