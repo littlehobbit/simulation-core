@@ -9,7 +9,6 @@ struct AppConfig {
   bool parse(int argc, char *argv[]) noexcept;  // NOLINT
 
   std::string xml_model_path;
-  std::string output_path;
   // TODO: log type - plain or json
 };
 
