@@ -7,6 +7,7 @@
 #include <ns3/channel-list.h>
 #include <ns3/config.h>
 #include <ns3/csma-net-device.h>
+#include <ns3/event-id.h>
 #include <ns3/ipv4-address.h>
 #include <ns3/ipv4-interface-address.h>
 #include <ns3/ipv4.h>
@@ -31,6 +32,7 @@
 #include "model/model_build_error.h"
 #include "model/name_service.h"
 #include "model/node.h"
+#include "model/registrator.h"
 #include "parser/parser.h"
 
 template <typename AttributeType, typename ExpectedValue>
@@ -122,6 +124,8 @@ TEST(Node, CreateNode) {  // NOLINT
   EXPECT_EQ(ns3::Names::FindPath(app.get()), "/Names/node/Client");
 
   EXPECT_ATTRIBUTE_EQ<ns3::UintegerValue>(app.get(), "RemotePort", 6666);
+
+  model::names::cleanup();
 }
 
 TEST(Device, CreateCsmaDevice) {  // NOLINT
@@ -133,7 +137,7 @@ TEST(Device, CreateCsmaDevice) {  // NOLINT
       .ipv6_addresses = {asio::ip::make_network_v6("dead:beef::1/16")},
       .attributes = {{"Mtu", "442"},
                      {"Address", "ab:cd:ef:01:02:03"},
-                     {"TxQueue", "ns3::DropTailQueue<Packet>"}}};
+                     {"TxQueue", "ns3::DropTailQueue<Packet>[MaxSize=100p]"}}};
 
   auto device = model::Device::create(desc);
 
@@ -226,6 +230,8 @@ TEST(Channel, Create) {  // NOLINT
   auto channels_count = ns3::ChannelList::GetNChannels();
   ASSERT_TRUE(channels_count > 0);
   EXPECT_EQ(ns3::ChannelList::GetChannel(channels_count - 1), channel->get());
+
+  model::names::cleanup();
 }
 
 TEST(Channel, BadAttribute) {  // NOLINT
@@ -307,14 +313,24 @@ TEST(Model, Build) {  // NOLINT
       .type = model::channel_type::PPP,
       .interfaces = {"node_a/eth0", "node_b/eth0"}};
 
+  parser::RegistratorDescription registrator_desc{
+      .source = "/NodeList/*/$ns3::Ipv4L3Protocol/Tx",
+      .type = "ns3::Uinteger32Probe",
+      .sink = "OutputBytes",
+      .start_time = "1s",
+  };
+
   parser::ModelDescription model_desc = {
-      .model_name = "model",                //
-      .nodes = {node_a_desc, node_b_desc},  //
-      .connections = {connection}};
+      .model_name = "model",
+      .nodes = {node_a_desc, node_b_desc},
+      .connections = {connection},
+      .registrators = {registrator_desc}  //
+  };
 
   model::Model model;
   model.build_from_description(model_desc);
 
+  // Create nodes ans connections
   auto* node_a = model.find_node(node_a_desc.name);
   ASSERT_TRUE(node_a != nullptr);
   EXPECT_TRUE(node_a->get_device(0).channel() != nullptr);
@@ -327,10 +343,19 @@ TEST(Model, Build) {  // NOLINT
   EXPECT_TRUE(node_b->get_device(0).channel() != nullptr);
   EXPECT_TRUE(node_b->get_device(0).get()->GetChannel() != nullptr);
 
+  // Create registrators
+  const auto& registrators = model.get_registrators();
+  ASSERT_EQ(registrators.size(), 1);
+  EXPECT_TRUE(registrators.at(0)->get_event_id().IsRunning());
+  ASSERT_FALSE(registrators.at(0)->get_event_id().IsExpired());
+  ASSERT_TRUE(registrators.at(0)->get_event_id().PeekEventImpl() != nullptr);
+  EXPECT_FALSE(
+      registrators.at(0)->get_event_id().PeekEventImpl()->IsCancelled());
+
   model::names::cleanup();
 }
 
-TEST(Model, BadIterfaces) {  // NOLINT
+TEST(Model, BadInterfaces) {  // NOLINT
   parser::NodeDescription node_a_desc = {
       .name = "node_a",
       .devices = {parser::DeviceDescription{
@@ -371,4 +396,21 @@ TEST(Model, BadIterfaces) {  // NOLINT
                  model::ModelBuildError);
     model::names::cleanup();
   }
+}
+
+TEST(Registrator, CreateAndSchedule) {  // NOLINT
+  parser::RegistratorDescription desc = {
+      .source = "/NodeList/*/$ns3::TcpL4Protocol/SocketList/*/CongestionWindow",
+      .type = "ns3::Uinteger32Probe",
+      .sink = "Output",
+      .file = "file",
+      .start_time = "2s",
+      .end_time = "3s"};
+
+  model::Registrator registrator{desc};
+  registrator.shedule_init();
+
+  ASSERT_TRUE(registrator.get_event_id().PeekEventImpl() != nullptr);
+  ASSERT_FALSE(registrator.get_event_id().IsExpired());
+  ASSERT_FALSE(registrator.get_event_id().PeekEventImpl()->IsCancelled());
 }

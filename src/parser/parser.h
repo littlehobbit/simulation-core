@@ -74,7 +74,8 @@ struct ConnectionDescription {
 struct RegistratorDescription {
   std::string source;
   std::string type;
-  std::string value_name;
+  std::string sink = "Output";
+  std::string value_name = "value";
   std::string file;
   std::string start_time;
   std::optional<std::string> end_time;

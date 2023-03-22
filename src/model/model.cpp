@@ -1,29 +1,19 @@
 #include "model.h"
 
+#include <memory>
 #include <string>
+#include <utility>
 
-#include <boost/algorithm/string.hpp>
-#include <boost/algorithm/string/classification.hpp>
-#include <boost/algorithm/string/compare.hpp>
-#include <boost/algorithm/string/split.hpp>
-
-#include <ns3/csma-helper.h>
-#include <ns3/csma-net-device.h>
-#include <ns3/drop-tail-queue.h>
-#include <ns3/internet-stack-helper.h>
-#include <ns3/mac48-address.h>
-#include <ns3/names.h>
-#include <ns3/net-device.h>
-#include <ns3/object-factory.h>
-#include <ns3/packet.h>
-#include <ns3/point-to-point-net-device.h>
-#include <ns3/ptr.h>
-#include <ns3/string.h>
+#include <ns3/nstime.h>
+#include <ns3/simulator.h>
 
 #include <fmt/core.h>
 
 #include "device.h"
+#include "model/channel.h"
 #include "model/model_build_error.h"
+#include "model/node.h"
+#include "model/registrator.h"
 #include "parser/parser.h"
 
 namespace model {
@@ -67,8 +57,12 @@ void Model::build_from_description(
     }
   }
 
-  // TODO: create registrators
-
+  // Create registrators
+  for (const auto &desc : description.registrators) {
+    auto registrator = std::make_unique<Registrator>(desc);
+    registrator->shedule_init();
+    _registrators.push_back(std::move(registrator));
+  }
 }
 
 Node *Model::find_node(const std::string &name) const {
@@ -76,6 +70,18 @@ Node *Model::find_node(const std::string &name) const {
     return it->second;
   }
   return nullptr;
+}
+
+void Model::start() {
+  // ns3::ShowProgress progress{};
+  // TODO: ns3::Simulator::Stop(_stop_time);
+  ns3::Simulator::Run();
+}
+
+void Model::stop() { ns3::Simulator::Stop(); }
+
+void Model::set_resulution(ns3::Time::Unit resulution) {
+  ns3::Time::SetResolution(resulution);
 }
 
 }  // namespace model

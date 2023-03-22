@@ -6,7 +6,7 @@
 #include <ns3/csma-channel.h>
 #include <ns3/object.h>
 #include <ns3/point-to-point-channel.h>
-#include <ns3/point-to-point-net-device.h>
+#include <ns3/point-to-point-net-device.h>  // IWYU pragma: keep
 #include <ns3/string.h>
 
 #include <fmt/core.h>

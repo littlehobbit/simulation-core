@@ -49,6 +49,7 @@ constexpr auto source_attr = "source";
 constexpr auto start_attr = "start";
 constexpr auto end_attr = "end";
 constexpr auto value_name_attr = "value_name";
+constexpr auto sink_attr = "sink";
 
 using util::get_attribute;
 using util::xml_element_range;
@@ -331,10 +332,13 @@ auto XmlParser::parse_statistics(const tinyxml2::XMLElement *root)
 
     auto value_name =
         registrator.get_attribute<std::string>(value_name_attr, false, "value");
+    auto sink =
+        registrator.get_attribute<std::string>(sink_attr, false, "Output");
 
     registrators.push_back(
         RegistratorDescription{.source = std::move(source),
                                .type = std::move(type),
+                               .sink = std::move(sink),
                                .value_name = std::move(value_name),
                                .file = std::move(file),
                                .start_time = std::move(start_time),

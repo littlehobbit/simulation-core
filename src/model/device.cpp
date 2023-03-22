@@ -33,7 +33,7 @@ Device::Device(const ns3::Ptr<ns3::NetDevice> &device, std::string name,
       _ipv4_addresses{std::move(ipv4)},
       _ipv6_addresses{std::move(ipv6)} {}
 
-Device Device::create(const parser::DeviceDescription &description) {
+Device Device::create(const parser::DeviceDescription &description) { 
   auto type = device_type_from_string(description.type);
   if (!type.has_value()) {
     throw ModelBuildError(fmt::format(R"(Invalid type "{}" of device "{}")",

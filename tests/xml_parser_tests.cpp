@@ -182,6 +182,7 @@ TEST(XmlParse, ReadsRegistrators) {  // NOLINT
                type="TestType"
                file="test-1"
                value_name="CWND"
+               sink="OutputBytes"
                start="0s"/>
 
               <registrator source="test-source"
@@ -203,6 +204,7 @@ TEST(XmlParse, ReadsRegistrators) {  // NOLINT
   EXPECT_EQ(first.start_time, "0s");
   EXPECT_FALSE(first.end_time.has_value());
   EXPECT_EQ(first.value_name, "CWND");
+  EXPECT_EQ(first.sink, "OutputBytes");
 
   auto& second = result.registrators[1];
   EXPECT_EQ(second.source, "test-source");
@@ -211,6 +213,7 @@ TEST(XmlParse, ReadsRegistrators) {  // NOLINT
   EXPECT_EQ(second.start_time, "0s");
   EXPECT_EQ(second.end_time, "2s");
   EXPECT_EQ(second.value_name, "value");  // by default
+  EXPECT_EQ(second.sink, "Output");       // by default
 }
 
 TEST(XmlParse, IncorrectNodeReading) {  // NOLINT
