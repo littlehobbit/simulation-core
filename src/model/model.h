@@ -9,13 +9,14 @@
 #include <ns3/nstime.h>
 
 #include "node.h"
-#include "registrator.h"
 
 namespace parser {
 struct ModelDescription;
 }
 
 namespace model {
+
+class Registrator;
 
 class Model {
  public:
@@ -28,7 +29,7 @@ class Model {
   void stop();
 
   auto get_registrators() const
-      -> const std::vector<std::unique_ptr<Registrator>> & {
+      -> const std::vector<std::shared_ptr<Registrator>> & {
     return _registrators;
   }
 
@@ -37,7 +38,7 @@ class Model {
  private:
   std::vector<std::unique_ptr<Node>> _nodes;
   std::map<std::string, Node *> _node_per_name;
-  std::vector<std::unique_ptr<Registrator>> _registrators;
+  std::vector<std::shared_ptr<Registrator>> _registrators;
 
   // TODO: add stop_time;
 };

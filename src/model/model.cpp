@@ -59,7 +59,7 @@ void Model::build_from_description(
 
   // Create registrators
   for (const auto &desc : description.registrators) {
-    auto registrator = std::make_unique<Registrator>(desc);
+    auto registrator = Registrator::create(desc);
     registrator->shedule_init();
     _registrators.push_back(std::move(registrator));
   }

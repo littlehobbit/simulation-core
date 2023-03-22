@@ -407,10 +407,10 @@ TEST(Registrator, CreateAndSchedule) {  // NOLINT
       .start_time = "2s",
       .end_time = "3s"};
 
-  model::Registrator registrator{desc};
-  registrator.shedule_init();
+  auto registrator = model::Registrator::create(desc);
+  registrator->shedule_init();
 
-  ASSERT_TRUE(registrator.get_event_id().PeekEventImpl() != nullptr);
-  ASSERT_FALSE(registrator.get_event_id().IsExpired());
-  ASSERT_FALSE(registrator.get_event_id().PeekEventImpl()->IsCancelled());
+  ASSERT_TRUE(registrator->get_event_id().PeekEventImpl() != nullptr);
+  ASSERT_FALSE(registrator->get_event_id().IsExpired());
+  ASSERT_FALSE(registrator->get_event_id().PeekEventImpl()->IsCancelled());
 }

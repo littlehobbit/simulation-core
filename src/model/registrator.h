@@ -1,6 +1,8 @@
 #ifndef __REGISTRATOR_H_RNBREI3Y1PHL__
 #define __REGISTRATOR_H_RNBREI3Y1PHL__
 
+#include <memory>
+
 #include <ns3/config.h>
 #include <ns3/event-id.h>
 #include <ns3/file-aggregator.h>
@@ -14,10 +16,9 @@
 
 namespace model {
 
-// maybe use std::enable_shared_from_this for Registrator
-class Registrator {
+class Registrator : public std::enable_shared_from_this<Registrator> {
  public:
-  Registrator(const parser::RegistratorDescription &descr)
+  explicit Registrator(const parser::RegistratorDescription &descr)
       : _probe_type{descr.type},
         _file_name{descr.file},
         _trace{descr.source},
@@ -26,10 +27,19 @@ class Registrator {
         _init_time{descr.start_time},
         _end_time{descr.end_time.has_value() ? descr.end_time.value() : "0s"} {}
 
+  static std::shared_ptr<Registrator> create(
+      const parser::RegistratorDescription &descr) {
+    return std::make_shared<Registrator>(descr);
+  }
+
   void shedule_init() {
-    // this may be invalid in capture
+    // NOLINTNEXTLINE
     _init_event =
-        ns3::Simulator::Schedule(_init_time, [this]() { initialize(); });
+        ns3::Simulator::Schedule(_init_time, [self = this->weak_from_this()]() {
+          if (!self.expired()) {
+            self.lock()->initialize();
+          }
+        });
   }
 
   auto get_event_id() const -> ns3::EventId { return _init_event; }
