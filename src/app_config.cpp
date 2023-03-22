@@ -12,7 +12,8 @@ bool AppConfig::parse(int argc, char *argv[]) noexcept {
 
   app.add_option("-i,--xml", xml_model_path,
                  "Path to network model in XML format")
-      ->check(CLI::ExistingFile);
+      ->check(CLI::ExistingFile)
+      ->required();
 
   try {
     app.parse(argc, argv);
