@@ -1,17 +1,15 @@
 #include "application.h"
 
-#include <map>
 #include <utility>
 
 #include <ns3/application.h>
-#include <ns3/object-factory.h>
-#include <ns3/string.h>
 #include <ns3/type-id.h>
 
 #include <fmt/core.h>
 
 #include "model_build_error.h"
 #include "parser/parser.h"
+#include "utils/object.h"
 
 namespace model {
 
@@ -21,38 +19,36 @@ Application::Application(const ns3::Ptr<ns3::Application> &app,
 
 auto Application::create(const parser::ApplicationDescription &description)
     -> Application {
-  ns3::TypeId type_id;
-  if (!ns3::TypeId::LookupByNameFailSafe(description.type, &type_id)) {
+  try {
+    if (!is_application(description.type)) {
+      throw ModelBuildError(
+          fmt::format("Can't create application of non-application type \"{}\"",
+                      description.type));
+    }
+
+    auto app = utils::create<ns3::Application>(description.type,
+                                               description.attributes);
+
+    return {app, description.name};
+  } catch (utils::BadTypeId &bad_type) {
     throw ModelBuildError(
         fmt::format(R"(Unknown type "{}" of entity named "{}")",
                     description.type, description.name));
+  } catch (utils::BadAttribute &bad_attribute) {
+    // TODO: refactor model build error
+    throw ModelBuildError(fmt::format(R"(Unknown attribute "{}" of type "{}")",
+                                      bad_attribute.attribute,
+                                      description.type));
   }
-
-  if (!is_application(type_id)) {
-    throw ModelBuildError(
-        fmt::format("Can't create application of non-application type \"{}\"",
-                    description.type));
-  }
-
-  ns3::ObjectFactory factory;
-  factory.SetTypeId(type_id);
-
-  for (const auto &[key, value] : description.attributes) {
-    ns3::TypeId::AttributeInformation info;
-    if (!type_id.LookupAttributeByName(key, &info)) {
-      throw ModelBuildError(fmt::format(
-          R"(Unknown attribute "{}" of type "{}")", key, description.type));
-    }
-
-    // TODO: use Object::SetAttributeFailSafe
-    factory.Set(key, ns3::StringValue(value));
-  }
-
-  auto app = factory.Create<ns3::Application>();
-  return {app, description.name};
 }
 
-bool Application::is_application(const ns3::TypeId &app_type) noexcept {
+bool Application::is_application(const std::string &type) noexcept {
+  ns3::TypeId app_type;
+
+  if (!ns3::TypeId::LookupByNameFailSafe(type, &app_type)) {
+    return false;
+  }
+
   return app_type.IsChildOf(ns3::Application::GetTypeId());
 }
 

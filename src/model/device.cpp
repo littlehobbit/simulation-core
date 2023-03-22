@@ -1,6 +1,5 @@
 #include "device.h"
 
-#include <map>
 #include <utility>
 
 #include <ns3/address.h>
@@ -13,7 +12,6 @@
 #include <ns3/object.h>
 #include <ns3/point-to-point-channel.h>
 #include <ns3/point-to-point-net-device.h>
-#include <ns3/string.h>
 
 #include <fmt/core.h>
 
@@ -21,6 +19,7 @@
 #include "model/channel.h"
 #include "model_build_error.h"
 #include "parser/parser.h"
+#include "utils/object.h"
 
 namespace model {
 
@@ -33,7 +32,7 @@ Device::Device(const ns3::Ptr<ns3::NetDevice> &device, std::string name,
       _ipv4_addresses{std::move(ipv4)},
       _ipv6_addresses{std::move(ipv6)} {}
 
-Device Device::create(const parser::DeviceDescription &description) { 
+Device Device::create(const parser::DeviceDescription &description) {
   auto type = device_type_from_string(description.type);
   if (!type.has_value()) {
     throw ModelBuildError(fmt::format(R"(Invalid type "{}" of device "{}")",
@@ -43,14 +42,17 @@ Device Device::create(const parser::DeviceDescription &description) {
   // TODO: extract creation to factory
   ns3::Ptr<ns3::NetDevice> device{};
   if (type == device_type::CSMA) {
-    device = ns3::CreateObject<ns3::CsmaNetDevice>();
+    device = utils::create<ns3::NetDevice>("ns3::CsmaNetDevice");
   } else if (type == device_type::PPP) {
-    device = ns3::CreateObject<ns3::PointToPointNetDevice>();
+    device = utils::create<ns3::NetDevice>("ns3::PointToPointNetDevice");
   }
-
   device->SetAddress(ns3::Mac48Address::Allocate());
-  for (const auto &[key, value] : description.attributes) {
-    device->SetAttribute(key, ns3::StringValue(value));
+
+  try {
+    utils::set_attributes(device, description.attributes);
+  } catch (utils::BadAttribute &attr) {
+    throw ModelBuildError(fmt::format(R"(Bad attribute "{}" of device "{}")",
+                                      attr.attribute, description.name));
   }
 
   std::vector<ns3::Ipv4InterfaceAddress> ipv4;

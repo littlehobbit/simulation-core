@@ -10,6 +10,7 @@ add_executable(
   address_tests.cpp
   model_tests.cpp
   name_service_tests.cpp
+  set_attribute_tests.cpp
 )
 
 target_include_directories(
