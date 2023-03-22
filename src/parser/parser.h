@@ -10,8 +10,8 @@
 #include <utility>
 #include <vector>
 
-#include "utils/address.h"
 #include "model/channel.h"
+#include "utils/address.h"
 
 namespace tinyxml2 {
 class XMLElement;
@@ -84,7 +84,8 @@ struct RegistratorDescription {
 struct ModelDescription {
   std::string model_name;
   bool polulate_tables = false;
-  // TODO: add simulation end time
+  std::string end_time = "0s";
+  std::string time_precision = "NS";
 
   std::vector<NodeDescription> nodes;
   std::vector<ConnectionDescription> connections;

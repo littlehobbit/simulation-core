@@ -247,24 +247,6 @@ TEST(XmlParse, IncorrectNodeReading) {  // NOLINT
   }
 }
 
-TEST(XmlParse, ErrorOnMultiplePopulate) {  // NOLINT
-  parser::XmlParser parser;
-
-  const auto* xml =
-      R"(
-      <?xml version="1.0" encoding="UTF-8"?>
-      <model name="CsmaNetworkModel">
-      <populate-routing-tables>true</populate-routing-tables>
-      <populate-routing-tables>true</populate-routing-tables>
-      <populate-routing-tables>true</populate-routing-tables>
-      <populate-routing-tables>true</populate-routing-tables>
-      <populate-routing-tables>true</populate-routing-tables>
-      </model>
-    )";
-
-  ASSERT_THROW(parser.parse(xml), parser::ParseError);  // NOLINT
-}
-
 TEST(XmlParse, BadAttributes) {  // NOLINT
   parser::XmlParser parser;
 
@@ -309,6 +291,27 @@ TEST(XmlParse, BadAttributes) {  // NOLINT
     )";
     EXPECT_THROW(parser.parse(no_key), parser::ParseError);
   }
+}
+
+TEST(XmlParse, ParseModelSettings) {  // NOLINT
+  parser::XmlParser parser;
+
+  // TODO: precision
+
+  const auto* xml =
+      R"(
+      <?xml version="1.0" encoding="UTF-8"?>
+      <model name="experiment">
+        <populate-routing-tables>true</populate-routing-tables>
+        <duration>3s</duration>
+        <precision>NS</precision>
+      </model>
+    )";
+
+  auto res = parser.parse(xml);
+
+  EXPECT_TRUE(res.polulate_tables);
+  EXPECT_EQ(res.end_time, "3s");
 }
 
 TEST(XmlParse, ModelRequiresName) {  // NOLINT

@@ -1,10 +1,13 @@
 #include "model.h"
 
+#include <iostream>
 #include <memory>
 #include <string>
 #include <utility>
 
+#include <ns3/ipv4-global-routing-helper.h>
 #include <ns3/nstime.h>
+#include <ns3/show-progress.h>
 #include <ns3/simulator.h>
 
 #include <fmt/core.h>
@@ -20,8 +23,9 @@ namespace model {
 
 void Model::build_from_description(
     const parser::ModelDescription &description) {
-  // TODO: extract
+  _end_time = ns3::Time{description.end_time};
 
+  // TODO: extract
   // Create nodes
   for (const auto &node_desc : description.nodes) {
     auto node = Node::create(node_desc);
@@ -63,6 +67,20 @@ void Model::build_from_description(
     registrator->shedule_init();
     _registrators.push_back(std::move(registrator));
   }
+
+  if (description.polulate_tables) {
+    ns3::Ipv4GlobalRoutingHelper::PopulateRoutingTables();
+  }
+
+  if (description.time_precision == "NS") {
+    _precision = ns3::Time::NS;
+  } else if (description.time_precision == "MS") {
+    _precision = ns3::Time::MS;
+  } else if (description.time_precision == "S") {
+    _precision = ns3::Time::S;
+  } else if (description.time_precision == "H") {
+    _precision = ns3::Time::H;
+  }
 }
 
 Node *Model::find_node(const std::string &name) const {
@@ -73,8 +91,16 @@ Node *Model::find_node(const std::string &name) const {
 }
 
 void Model::start() {
-  // ns3::ShowProgress progress{};
-  // TODO: ns3::Simulator::Stop(_stop_time);
+  set_resulution(_precision);
+
+  std::unique_ptr<ns3::ShowProgress> progress_shower;
+  if (_end_time != ns3::Time{}) {
+    progress_shower = std::make_unique<ns3::ShowProgress>();
+    progress_shower->SetVerbose(true);
+    progress_shower->SetStream(std::cout);
+    ns3::Simulator::Stop(_end_time);
+  }
+
   ns3::Simulator::Run();
 }
 

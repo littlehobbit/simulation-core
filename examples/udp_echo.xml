@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model name="udp_echo">
   <populate-routing-tables>true</populate-routing-tables>
+  <duration>33s</duration>
+  <precision>NS</precision>
 
   <node id="0" name="Client">
     <device-list>
@@ -23,6 +25,8 @@
         <attributes>
           <attribute key="RemotePort" value="666"/>
           <attribute key="RemoteAddress" value="0-4-0A:01:16:02"/>
+          <attribute key="MaxPackets" value="10000000"/>
+          <attribute key="Interval" value="1ms"/>
         </attributes>
       </application>
     </applications>

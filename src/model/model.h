@@ -40,7 +40,8 @@ class Model {
   std::map<std::string, Node *> _node_per_name;
   std::vector<std::shared_ptr<Registrator>> _registrators;
 
-  // TODO: add stop_time;
+  ns3::Time _end_time{};
+  ns3::Time::Unit _precision = ns3::Time::NS;
 };
 
 }  // namespace model

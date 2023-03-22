@@ -7,8 +7,8 @@
 
 #include <tinyxml2.h>
 
-#include "utils/address.h"
 #include "parser/parse_util.h"
+#include "utils/address.h"
 
 using namespace std::literals;
 
@@ -32,6 +32,7 @@ constexpr auto interfaces_tag = "interfaces";
 constexpr auto interface_tag = "interface";
 constexpr auto statistics_tag = "statistics";
 constexpr auto registrator_tag = "registrator";
+constexpr auto duration_tag = "duration";
 
 constexpr auto id_attr = "id";
 constexpr auto name_attr = "name";
@@ -84,12 +85,11 @@ void XmlParser::parse_model_settings(const tinyxml2::XMLElement *root,
   const auto *populate = root->FirstChildElement(populate_tag);
   if (populate != nullptr) {
     populate->QueryBoolText(&description.polulate_tables);
+  }
 
-    // TODO: maybe delete? ombigious check
-    const auto *next = populate->NextSiblingElement(populate_tag);
-    if (next != nullptr) {
-      throw ParseError("Redefinition of <populate-routing-tables>");
-    }
+  const auto *duration = root->FirstChildElement(duration_tag);
+  if (duration != nullptr) {
+    description.end_time = duration->GetText();
   }
 
   // TODO: parse simulation end time
