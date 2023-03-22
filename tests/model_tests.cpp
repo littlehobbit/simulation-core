@@ -61,8 +61,12 @@ void EXPECT_ATTRIBUTE_EQ(ns3::Ptr<ns3::Object> object,
   }
 }
 
-TEST(Node, CreateNode) {  // NOLINT
+class ModelTest : public ::testing::Test {
+ public:
+  void TearDown() override { model::names::cleanup(); }
+};
 
+TEST_F(ModelTest, CreateNode) {  // NOLINT
   parser::ApplicationDescription application_desc{
       .name = "Client",
       .type = "ns3::UdpEchoClient",
@@ -124,11 +128,9 @@ TEST(Node, CreateNode) {  // NOLINT
   EXPECT_EQ(ns3::Names::FindPath(app.get()), "/Names/node/Client");
 
   EXPECT_ATTRIBUTE_EQ<ns3::UintegerValue>(app.get(), "RemotePort", 6666);
-
-  model::names::cleanup();
 }
 
-TEST(Device, CreateCsmaDevice) {  // NOLINT
+TEST_F(ModelTest, CreateCsmaDevice) {  // NOLINT
   parser::DeviceDescription desc{
       .name = "eth0",
       .type = "Csma",
@@ -162,12 +164,12 @@ TEST(Device, CreateCsmaDevice) {  // NOLINT
   EXPECT_EQ(device.ipv6_addresses(), expexted_ipv6);
 }
 
-TEST(Device, BadDeviceType) {  // NOLINT
+TEST_F(ModelTest, BadDeviceType) {  // NOLINT
   parser::DeviceDescription desc{.name = "eth0", .type = ""};
   EXPECT_ANY_THROW(model::Device::create(desc));
 }
 
-TEST(Application, Create) {  // NOLINT
+TEST_F(ModelTest, CreateApplication) {  // NOLINT
   parser::ApplicationDescription description{
       .name = "app",
       .type = "ns3::UdpEchoClient",
@@ -186,19 +188,19 @@ TEST(Application, Create) {  // NOLINT
   //                                       "01:01:01:01");
 }
 
-TEST(Application, ThrowOnBadType) {  // NOLINT
+TEST_F(ModelTest, ThrowOnBadType) {  // NOLINT
   parser::ApplicationDescription descr{.type = "bad"};
   EXPECT_THROW(model::Application::create(descr), model::ModelBuildError);
 }
 
-TEST(Application, ThrowOnBadAttribute) {  // NOLINT
+TEST_F(ModelTest, ThrowOnBadAttribute) {  // NOLINT
   parser::ApplicationDescription descr{.type = "ns3::UdpEchoClient",
                                        .attributes = {{"bad", "attribute"}}};
   EXPECT_THROW(model::Application::create(descr), model::ModelBuildError);
 }
 
 // BUG: bad value makes asserts
-// TEST(Applcation, BadAttributeValue) { // NOLINT
+// TEST_F(ModelTest, BadApplicationAttributeValue) { // NOLINT
 //   parser::ApplicationDescription description{
 //       .name = "app",
 //       .type = "ns3::UdpEchoClient",
@@ -207,12 +209,12 @@ TEST(Application, ThrowOnBadAttribute) {  // NOLINT
 //   model::ModelBuildError);
 // }
 
-TEST(Application, CreateNonApplication) {  // NOLINT
+TEST_F(ModelTest, CreateNonApplication) {  // NOLINT
   parser::ApplicationDescription descr{.type = "ns3::CsmaNetDevice"};
   EXPECT_THROW(model::Application::create(descr), model::ModelBuildError);
 }
 
-TEST(Channel, Create) {  // NOLINT
+TEST_F(ModelTest, CreateChannel) {  // NOLINT
   parser::ConnectionDescription description = {
       .name = "test-connection",
       .type = model::channel_type::CSMA,
@@ -230,11 +232,9 @@ TEST(Channel, Create) {  // NOLINT
   auto channels_count = ns3::ChannelList::GetNChannels();
   ASSERT_TRUE(channels_count > 0);
   EXPECT_EQ(ns3::ChannelList::GetChannel(channels_count - 1), channel->get());
-
-  model::names::cleanup();
 }
 
-TEST(Channel, BadAttribute) {  // NOLINT
+TEST_F(ModelTest, BadChannelAttribute) {  // NOLINT
   parser::ConnectionDescription description = {
       .name = "test-connection",
       .type = model::channel_type::CSMA,
@@ -243,7 +243,7 @@ TEST(Channel, BadAttribute) {  // NOLINT
   EXPECT_THROW(model::Channel::create(description), model::ModelBuildError);
 }
 
-TEST(Device, ConnectToChannel) {  // NOLINT
+TEST_F(ModelTest, ConnectToChannel) {  // NOLINT
   parser::DeviceDescription device_desc{
       .name = "eth0",
       .type = "Csma",
@@ -267,11 +267,9 @@ TEST(Device, ConnectToChannel) {  // NOLINT
 
   // NEED TO FIND ALL DEVICES WRAPPERS FOR /{node}/{interface_name}
   // Maybe add DeviceStorage::find() for this
-
-  model::names::cleanup();
 }
 
-TEST(Device, ErrorOnBadTypes) {  // NOLINT
+TEST_F(ModelTest, ErrorOnBadDeviceTypes) {  // NOLINT
   parser::DeviceDescription device_desc{
       .name = "eth0",
       .type = "PPP",
@@ -289,11 +287,9 @@ TEST(Device, ErrorOnBadTypes) {  // NOLINT
   auto channel = model::Channel::create(channel_desc);
 
   EXPECT_THROW(device.attach(channel), model::ModelBuildError);
-
-  model::names::cleanup();
 }
 
-TEST(Model, Build) {  // NOLINT
+TEST_F(ModelTest, BuildModel) {  // NOLINT
   parser::NodeDescription node_a_desc = {
       .name = "node_a",
       .devices = {parser::DeviceDescription{
@@ -351,11 +347,9 @@ TEST(Model, Build) {  // NOLINT
   ASSERT_TRUE(registrators.at(0)->get_event_id().PeekEventImpl() != nullptr);
   EXPECT_FALSE(
       registrators.at(0)->get_event_id().PeekEventImpl()->IsCancelled());
-
-  model::names::cleanup();
 }
 
-TEST(Model, BadInterfaces) {  // NOLINT
+TEST_F(ModelTest, ConnectUnknownNode) {  // NOLINT
   parser::NodeDescription node_a_desc = {
       .name = "node_a",
       .devices = {parser::DeviceDescription{
@@ -373,32 +367,43 @@ TEST(Model, BadInterfaces) {  // NOLINT
   parser::ModelDescription model_desc = {
       .model_name = "model",                //
       .nodes = {node_a_desc, node_b_desc},  //
-  };
+      .connections = {{.name = "bad_node",
+                       .type = model::channel_type::PPP,
+                       .interfaces = {"UNKNOWN_NAME/eth0", "node_b/eth0"}}}};
 
-  {
-    model::Model model;
-    model_desc.connections = {
-        {.name = "a_to_b",
-         .type = model::channel_type::PPP,
-         .interfaces = {"UNKNOWN_NAME/eth0", "node_b/eth0"}}};
-    EXPECT_THROW(model.build_from_description(model_desc),
-                 model::ModelBuildError);
-    model::names::cleanup();
-  }
-
-  {
-    model::Model model;
-    model_desc.connections = {
-        {.name = "a_to_b",
-         .type = model::channel_type::PPP,
-         .interfaces = {"node_a/eth0", "node_b/INTERFACE"}}};
-    EXPECT_THROW(model.build_from_description(model_desc),
-                 model::ModelBuildError);
-    model::names::cleanup();
-  }
+  model::Model model;
+  EXPECT_THROW(model.build_from_description(model_desc),
+               model::ModelBuildError);
 }
 
-TEST(Registrator, CreateAndSchedule) {  // NOLINT
+TEST_F(ModelTest, ConnectUnknownInterface) {  // NOLINT
+  parser::NodeDescription node_a_desc = {
+      .name = "node_a",
+      .devices = {parser::DeviceDescription{
+          .name = "eth0",
+          .type = "PPP",
+          .ipv4_addresses = {asio::ip::make_network_v4("10.10.10.2/24")}}}};
+
+  parser::NodeDescription node_b_desc = {
+      .name = "node_b",
+      .devices = {parser::DeviceDescription{
+          .name = "eth0",
+          .type = "PPP",
+          .ipv4_addresses = {asio::ip::make_network_v4("10.10.10.4/24")}}}};
+
+  parser::ModelDescription model_desc = {
+      .model_name = "model",                //
+      .nodes = {node_a_desc, node_b_desc},  //
+      .connections = {{.name = "bad_node",
+                       .type = model::channel_type::PPP,
+                       .interfaces = {"node_a/eth0", "node_b/INTERFACE"}}}};
+
+  model::Model model;
+  EXPECT_THROW(model.build_from_description(model_desc),
+               model::ModelBuildError);
+}
+
+TEST_F(ModelTest, CreateAndScheduleRegistrator) {  // NOLINT
   parser::RegistratorDescription desc = {
       .source = "/NodeList/*/$ns3::TcpL4Protocol/SocketList/*/CongestionWindow",
       .type = "ns3::Uinteger32Probe",
