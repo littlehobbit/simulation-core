@@ -10,6 +10,8 @@
     { include: ["<boost/asio/ip/impl/network_v4.ipp>",            "private", "<boost/asio/ip/network_v4.hpp>", "public"]},
     { include: ["<boost/asio/ip/impl/address_v6.ipp>",            "private", "<boost/asio/ip/address_v6.hpp>", "public"]},
     { include: ["<boost/asio/ip/impl/network_v6.ipp>",            "private", "<boost/asio/ip/network_v6.hpp>", "public"]},
+    { include: ["<CLI/impl/App_inl.hpp>",            "private", "<CLI/CLI.hpp>", "public"]},
+    { include: ["<CLI/impl/Option_inl.hpp>",            "private", "<CLI/CLI.hpp>", "public"]},
     { include: ["<bits/cxxabi_forced.h>",                   "private", "<ctime>", "public"]},
     { include: ['"ThorSerialize/JsonPrinter.source"',       "private", "<ThorSerialize/JsonPrinter.h>", "public"]},
     { include: ['"ThorSerialize/Serialize.tpp"',            "private", "<ThorSerialize/Serialize.h>", "public"]},
