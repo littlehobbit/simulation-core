@@ -28,7 +28,6 @@ enum class device_type { Undedined, CSMA, PPP };
 
 class Device {
  public:
-  //  TODO: return shared-ptr
   static Device create(const parser::DeviceDescription& description);
 
   auto get() const -> ns3::Ptr<ns3::NetDevice> { return _device; }

@@ -15,10 +15,10 @@
 
 #include <fmt/core.h>
 
-#include "utils/address.h"
 #include "model/channel.h"
 #include "model_build_error.h"
 #include "parser/parser.h"
+#include "utils/address.h"
 #include "utils/object.h"
 
 namespace model {
@@ -70,11 +70,13 @@ Device Device::create(const parser::DeviceDescription &description) {
 
 void Device::attach(const std::shared_ptr<Channel> &channel) {
   if (_type == device_type::CSMA && channel->type() == channel_type::CSMA) {
+    // TODO: csma can be multiple
     auto csma_device = _device->GetObject<ns3::CsmaNetDevice>();
     auto csma_channel = channel->get()->GetObject<ns3::CsmaChannel>();
     csma_device->Attach(csma_channel);
   } else if (_type == device_type::PPP &&
              channel->type() == channel_type::PPP) {
+    // TODO: check PPP only 2 device
     auto ppp_device = _device->GetObject<ns3::PointToPointNetDevice>();
     auto ppp_channel = channel->get()->GetObject<ns3::PointToPointChannel>();
     ppp_device->Attach(ppp_channel);

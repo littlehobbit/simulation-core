@@ -1,14 +1,17 @@
 #include "node.h"
 
 #include <algorithm>
-#include <stdexcept>
+#include <sstream>
 
 #include <boost/asio/ip/address_v4.hpp>
 
 #include <ns3/internet-stack-helper.h>
 #include <ns3/ipv4-address.h>
+#include <ns3/ipv4-interface-address.h>
 #include <ns3/ipv4-static-routing-helper.h>
 #include <ns3/ipv4-static-routing.h>
+#include <ns3/ipv6-address.h>
+#include <ns3/ipv6-interface-address.h>
 #include <ns3/ipv6-static-routing-helper.h>
 #include <ns3/ipv6-static-routing.h>
 #include <ns3/net-device.h>
@@ -17,12 +20,12 @@
 
 #include <fmt/core.h>
 
-#include "utils/address.h"
 #include "model/application.h"
 #include "model/device.h"
 #include "model/model_build_error.h"
 #include "name_service.h"
 #include "parser/parser.h"
+#include "utils/address.h"
 
 namespace model {
 
@@ -36,8 +39,11 @@ void Node::attach(Device &&device) {
 
     for (const auto &address : device.ipv4_addresses()) {
       if (!_ipv4->AddAddress(interface, address)) {
-        // TODO: extract error
-        throw std::runtime_error("Can't assign address");
+        std::stringstream address_stream;
+        address.GetAddress().Print(address_stream);
+        throw ModelBuildError(
+            fmt::format("Can't assign address {} to interface \"{}\"",
+                        address_stream.str(), device.name()));
       }
     }
   }
@@ -49,7 +55,12 @@ void Node::attach(Device &&device) {
 
     for (const auto &address : device.ipv6_addresses()) {
       if (!_ipv6->AddAddress(interface, address)) {
-        throw std::runtime_error("Can't assign address");
+        // TODO: reduce code duplication
+        std::stringstream address_stream;
+        address.GetAddress().Print(address_stream);
+        throw ModelBuildError(
+            fmt::format("Can't assign address {} to interface \"{}\"",
+                        address_stream.str(), device.name()));
       }
     }
   }

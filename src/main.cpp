@@ -3,8 +3,6 @@
 #include <iostream>
 #include <string>
 
-#include <ns3/nstime.h>
-
 #include "app_config.h"
 #include "model/model.h"
 #include "parser/parser.h"
@@ -29,11 +27,9 @@ int main(int argc, char *argv[]) {
     model::Model model;
     model.build_from_description(model_description);
 
-    model.set_resulution(ns3::Time::NS);
     model.start();
 
-    // TODO: extract exceptions  (use fmt only in exception handler)
-    // TODO: 
+    // TODO: extract exceptions (use fmt only in exception handler)
   } catch (std::exception &e) {
     std::cerr << "Error: " << e.what() << std::endl;
   }
