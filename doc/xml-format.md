@@ -5,6 +5,7 @@
   - Настройки модели
     - Популирование таблиц маршрутизации
     - Длительность симуляции
+    - Точность времени
 
   - Элементы сети - `<node>`
     - их названия
@@ -220,6 +221,7 @@
 <statistics>
   <registrator source="/Names/node-a/$ns3::TcpL4Protocol/SocketList/0/CongestionWindow"
                type="ns3::Uinteger32Probe"
+               sink="Output"
                file="node-a-cwnd"
                value_name="cwnd"
                start="1s"
@@ -232,6 +234,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model name="UdpEchoExperiment">
   <populate-routing-tables>true</populate-routing-tables>
+  <duration>10s</duration>
+  <precision>NS</precision>
 
   <node-list>
     <node id="0" name="Client">
