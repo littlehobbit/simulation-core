@@ -10,7 +10,7 @@
 #include <utility>
 #include <vector>
 
-#include "address.h"
+#include "utils/address.h"
 #include "model/channel.h"
 
 namespace tinyxml2 {

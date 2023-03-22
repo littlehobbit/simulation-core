@@ -15,7 +15,7 @@
 
 #include <fmt/core.h>
 
-#include "address.h"
+#include "utils/address.h"
 #include "model/channel.h"
 #include "model_build_error.h"
 #include "parser/parser.h"

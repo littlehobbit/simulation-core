@@ -24,7 +24,7 @@
 
 #include <gtest/gtest.h>
 
-#include "address.h"
+#include "utils/address.h"
 #include "model/application.h"
 #include "model/channel.h"
 #include "model/device.h"

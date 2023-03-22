@@ -7,7 +7,7 @@
 
 #include <tinyxml2.h>
 
-#include "address.h"
+#include "utils/address.h"
 #include "parser/parse_util.h"
 
 using namespace std::literals;

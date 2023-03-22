@@ -17,7 +17,7 @@
 
 #include <fmt/core.h>
 
-#include "address.h"
+#include "utils/address.h"
 #include "model/application.h"
 #include "model/device.h"
 #include "model/model_build_error.h"
