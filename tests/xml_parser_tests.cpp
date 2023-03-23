@@ -340,6 +340,8 @@ TEST(XmlParse, ErrorOnNoModelTag) {  // NOLINT
   ASSERT_THROW(parser.parse(xml), parser::ParseError);
 }
 
+using parser::util::get_attribute;
+
 TEST(XmlParseUtil, ExtractAttribute) {  // NOLINT
   constexpr auto xml = R"(
     <item value_int="42" value_str="string"/>
@@ -348,11 +350,9 @@ TEST(XmlParseUtil, ExtractAttribute) {  // NOLINT
   tinyxml2::XMLDocument doc;
   doc.Parse(xml);
 
-  ASSERT_EQ(parser::util::get_attribute<int>(doc.RootElement(), "value_int"),
-            42);
-  ASSERT_STREQ(
-      parser::util::get_attribute<const char*>(doc.RootElement(), "value_str"),
-      "string");
+  ASSERT_EQ(get_attribute<int>(doc.RootElement(), "value_int"), 42);
+  ASSERT_STREQ(get_attribute<const char*>(doc.RootElement(), "value_str"),
+               "string");
 }
 
 TEST(XmlParseUtil, ThrowOnRequiredMissing) {  // NOLINT
@@ -363,7 +363,7 @@ TEST(XmlParseUtil, ThrowOnRequiredMissing) {  // NOLINT
   tinyxml2::XMLDocument doc;
   doc.Parse(xml);
 
-  EXPECT_THROW(parser::util::get_attribute<int>(doc.RootElement(), "missed"),
+  EXPECT_THROW(get_attribute<int>(doc.RootElement(), "missed"),
                parser::ParseError);
 }
 
@@ -375,12 +375,8 @@ TEST(XmlParseUtil, DefaultOnNonRequiredMissing) {  // NOLINT
   tinyxml2::XMLDocument doc;
   doc.Parse(xml);
 
-  ASSERT_EQ(
-      parser::util::get_attribute<int>(doc.RootElement(), "missed", false),
-      int{});
-  ASSERT_EQ(
-      parser::util::get_attribute<int>(doc.RootElement(), "missed", false, 42),
-      42);
+  ASSERT_EQ(get_attribute<int>(doc.RootElement(), "missed", false), int{});
+  ASSERT_EQ(get_attribute<int>(doc.RootElement(), "missed", false, 42), 42);
 }
 
 TEST(XmlParseUtil, ThrowOnMissedType) {  // NOLINT
@@ -391,10 +387,18 @@ TEST(XmlParseUtil, ThrowOnMissedType) {  // NOLINT
   tinyxml2::XMLDocument doc;
   doc.Parse(xml);
 
-  EXPECT_THROW(
-      parser::util::get_attribute<int>(doc.RootElement(), "value", true),
-      parser::ParseError);
-  EXPECT_THROW(
-      parser::util::get_attribute<int>(doc.RootElement(), "value", false),
-      parser::ParseError);
+  EXPECT_THROW(get_attribute<int>(doc.RootElement(), "value", true),
+               parser::ParseError);
+  EXPECT_THROW(get_attribute<int>(doc.RootElement(), "value", false),
+               parser::ParseError);
+}
+
+TEST(XmlParseUtil, OkWithEscapedSymbols) {  // NOLINT
+  constexpr auto xml = R"(<item value="&lt;&gt;&#38;&#39;&#34;"/>)";
+
+  tinyxml2::XMLDocument doc;
+  doc.Parse(xml);
+
+  auto parsed = get_attribute<std::string>(doc.RootElement(), "value");
+  EXPECT_EQ(parsed, "<>&'\"");
 }
