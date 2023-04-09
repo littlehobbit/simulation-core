@@ -12,21 +12,28 @@
 
 namespace model {
 
+namespace channel_factory {
+auto create(channel_type type, const parser::Attributes &attributes) {
+  ns3::Ptr<ns3::Channel> channel;
+
+  if (type == channel_type::CSMA) {
+    channel = utils::create<ns3::Channel>("ns3::CsmaChannel", attributes);
+  } else if (type == channel_type::PPP) {
+    channel =
+        utils::create<ns3::Channel>("ns3::PointToPointChannel", attributes);
+  }
+  return channel;
+}
+}  // namespace channel_factory
+
 auto Channel::create(const parser::ConnectionDescription &description)
     -> std::shared_ptr<Channel> {
   try {
-    ns3::Ptr<ns3::Channel> channel;
-    if (description.type == channel_type::CSMA) {
-      channel = utils::create<ns3::Channel>("ns3::CsmaChannel",
-                                            description.attributes);
-    } else if (description.type == channel_type::PPP) {
-      channel = utils::create<ns3::Channel>("ns3::PointToPointChannel",
-                                            description.attributes);
-    }
-
+    auto channel =
+        channel_factory::create(description.type, description.attributes);
     names::add(channel, description.name);
-    return std::shared_ptr<Channel>(
-        new Channel{channel, description.name, description.type});
+    return std::make_shared<Channel>(channel, description.name,
+                                     description.type);
   } catch (utils::BadTypeId &bad_type) {
     throw ModelBuildError(
         fmt::format("Can't create channel of type \"{}\"", bad_type.type));
@@ -35,6 +42,8 @@ auto Channel::create(const parser::ConnectionDescription &description)
         fmt::format(R"(Failed set attribute "{}" with value "{}")",
                     bad_attribute.attribute, bad_attribute.value));
   }
+
+  // TODO: Not all paths returns value
 }
 
 }  // namespace model

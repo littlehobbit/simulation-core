@@ -20,6 +20,10 @@ enum class channel_type { Undefined, CSMA, PPP };
 
 class Channel {
  public:
+  Channel(const ns3::Ptr<ns3::Channel> &channel, std::string name,
+          channel_type type)
+      : _name{std::move(name)}, _channel{channel}, _type{type} {}
+
   static auto create(const parser::ConnectionDescription &description)
       -> std::shared_ptr<Channel>;
 
@@ -30,10 +34,6 @@ class Channel {
   auto name() const -> const std::string & { return _name; }
 
  private:
-  Channel(const ns3::Ptr<ns3::Channel> &channel, std::string name,
-          channel_type type)
-      : _name{std::move(name)}, _channel{channel}, _type{type} {}
-
   std::string _name;
   ns3::Ptr<ns3::Channel> _channel;
   channel_type _type;
