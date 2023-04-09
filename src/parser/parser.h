@@ -10,6 +10,8 @@
 #include <utility>
 #include <vector>
 
+#include <ns3/nstime.h>
+
 #include "model/channel.h"
 #include "utils/address.h"
 
@@ -85,7 +87,7 @@ struct ModelDescription {
   std::string model_name;
   bool polulate_tables = false;
   std::string end_time = "0s";
-  std::string time_precision = "NS";
+  ns3::Time::Unit time_precision = ns3::Time::NS;
 
   std::vector<NodeDescription> nodes;
   std::vector<ConnectionDescription> connections;

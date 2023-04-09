@@ -25,7 +25,8 @@ void Model::build_from_description(
     const parser::ModelDescription &description) {
   _end_time = ns3::Time{description.end_time};
 
-  // TODO: extract
+  // TODO: extract methods
+
   // Create nodes
   for (const auto &node_desc : description.nodes) {
     auto node = Node::create(node_desc);
@@ -72,15 +73,7 @@ void Model::build_from_description(
     ns3::Ipv4GlobalRoutingHelper::PopulateRoutingTables();
   }
 
-  if (description.time_precision == "NS") {
-    _precision = ns3::Time::NS;
-  } else if (description.time_precision == "MS") {
-    _precision = ns3::Time::MS;
-  } else if (description.time_precision == "S") {
-    _precision = ns3::Time::S;
-  } else if (description.time_precision == "H") {
-    _precision = ns3::Time::H;
-  }
+  set_resulution(description.time_precision);
 }
 
 Node *Model::find_node(const std::string &name) const {
@@ -91,8 +84,6 @@ Node *Model::find_node(const std::string &name) const {
 }
 
 void Model::start() {
-  set_resulution(_precision);
-
   std::unique_ptr<ns3::ShowProgress> progress_shower;
   if (_end_time != ns3::Time{}) {
     progress_shower = std::make_unique<ns3::ShowProgress>();

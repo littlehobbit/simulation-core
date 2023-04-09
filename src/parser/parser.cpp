@@ -5,6 +5,8 @@
 #include <string_view>
 #include <type_traits>
 
+#include <ns3/nstime.h>
+
 #include <tinyxml2.h>
 
 #include "parser/parse_util.h"
@@ -33,6 +35,7 @@ constexpr auto interface_tag = "interface";
 constexpr auto statistics_tag = "statistics";
 constexpr auto registrator_tag = "registrator";
 constexpr auto duration_tag = "duration";
+constexpr auto precision_tag = "precision";
 
 constexpr auto id_attr = "id";
 constexpr auto name_attr = "name";
@@ -92,7 +95,17 @@ void XmlParser::parse_model_settings(const tinyxml2::XMLElement *root,
     description.end_time = duration->GetText();
   }
 
-  // TODO: parse simulation end time
+  const auto *precision = root->FirstChildElement(precision_tag);
+  if (precision != nullptr) {
+    auto precision_str = std::string{precision->GetText()};
+    auto val = parser::util::parse_precision(precision_str);
+    
+    if (val.has_value()) {
+      description.time_precision = *val;
+    } else {
+      throw ParseError("Unknown precision value " + precision_str);
+    }
+  }
 }
 
 auto XmlParser::parse_nodes(const tinyxml2::XMLElement *root)

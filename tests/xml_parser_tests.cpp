@@ -3,6 +3,8 @@
 #include <boost/asio/ip/address_v6.hpp>
 #include <boost/asio/ip/network_v6.hpp>
 
+#include <ns3/nstime.h>
+
 #include <gtest/gtest.h>
 #include <tinyxml2.h>
 
@@ -293,10 +295,76 @@ TEST(XmlParse, BadAttributes) {  // NOLINT
   }
 }
 
-TEST(XmlParse, ParseModelSettings) {  // NOLINT
+TEST(XmlParse, ParseTimePrecision) {
   parser::XmlParser parser;
 
-  // TODO: precision
+  {
+    const auto* xml =
+        R"(
+      <?xml version="1.0" encoding="UTF-8"?>
+      <model name="experiment">
+      <precision>MS</precision>
+      </model>
+    )";
+
+    auto res = parser.parse(xml);
+    EXPECT_EQ(res.time_precision, ns3::Time::MS);
+  }
+
+  {
+    const auto* xml =
+        R"(
+      <?xml version="1.0" encoding="UTF-8"?>
+      <model name="experiment">
+      <precision>NS</precision>
+      </model>
+    )";
+
+    auto res = parser.parse(xml);
+    EXPECT_EQ(res.time_precision, ns3::Time::NS);
+  }
+
+  {
+    const auto* xml =
+        R"(
+      <?xml version="1.0" encoding="UTF-8"?>
+      <model name="experiment">
+      <precision>S</precision>
+      </model>
+    )";
+
+    auto res = parser.parse(xml);
+    EXPECT_EQ(res.time_precision, ns3::Time::S);
+  }
+
+  {
+    const auto* xml =
+        R"(
+      <?xml version="1.0" encoding="UTF-8"?>
+      <model name="experiment">
+      <precision>H</precision>
+      </model>
+    )";
+
+    auto res = parser.parse(xml);
+    EXPECT_EQ(res.time_precision, ns3::Time::H);
+  }
+
+  {
+    const auto* xml =
+        R"(
+      <?xml version="1.0" encoding="UTF-8"?>
+      <model name="experiment">
+      <precision>ERROR</precision>
+      </model>
+    )";
+
+    EXPECT_THROW(parser.parse(xml), parser::ParseError);
+  }
+}
+
+TEST(XmlParse, ParseModelSettings) {  // NOLINT
+  parser::XmlParser parser;
 
   const auto* xml =
       R"(
@@ -312,6 +380,7 @@ TEST(XmlParse, ParseModelSettings) {  // NOLINT
 
   EXPECT_TRUE(res.polulate_tables);
   EXPECT_EQ(res.end_time, "3s");
+  EXPECT_EQ(res.time_precision, ns3::Time::NS);
 }
 
 TEST(XmlParse, ModelRequiresName) {  // NOLINT

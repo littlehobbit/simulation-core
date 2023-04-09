@@ -1,6 +1,7 @@
 #ifndef __PARSE_UTIL_H_5T1B4GE8TUJ5__
 #define __PARSE_UTIL_H_5T1B4GE8TUJ5__
 
+#include <optional>
 #include <string_view>
 
 #include <tinyxml2.h>
@@ -91,6 +92,23 @@ struct xml_element_range {
   const tinyxml2::XMLElement* root;
   std::string_view tag;
 };
+
+inline auto parse_precision(std::string_view precision_str) noexcept
+    -> std::optional<ns3::Time::Unit> {
+  if (precision_str == "NS") {
+    return ns3::Time::NS;
+  }
+  if (precision_str == "MS") {
+    return ns3::Time::MS;
+  }
+  if (precision_str == "S") {
+    return ns3::Time::S;
+  }
+  if (precision_str == "H") {
+    return ns3::Time::H;
+  }
+  return {};
+}
 
 };  // namespace parser::util
 
