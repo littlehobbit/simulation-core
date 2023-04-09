@@ -69,8 +69,12 @@ Device Device::create(const parser::DeviceDescription &description) {
 }
 
 void Device::attach(const std::shared_ptr<Channel> &channel) {
+  if (has_channel()) {
+    throw ModelBuildError(fmt::format(R"(Device "{}" already has channel "{}")",
+                                      _name, _attached_channel->name()));
+  }
+
   if (_type == device_type::CSMA && channel->type() == channel_type::CSMA) {
-    // TODO: csma can be multiple
     auto csma_device = _device->GetObject<ns3::CsmaNetDevice>();
     auto csma_channel = channel->get()->GetObject<ns3::CsmaChannel>();
     csma_device->Attach(csma_channel);
@@ -86,6 +90,10 @@ void Device::attach(const std::shared_ptr<Channel> &channel) {
   }
 
   _attached_channel = channel;
+}
+
+bool Device::has_channel() const {
+  return _attached_channel != nullptr;
 }
 
 };  // namespace model

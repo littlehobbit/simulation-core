@@ -73,7 +73,7 @@ void Model::build_from_description(
     ns3::Ipv4GlobalRoutingHelper::PopulateRoutingTables();
   }
 
-  set_resulution(description.time_precision);
+  time_resolution = description.time_precision;
 }
 
 Node *Model::find_node(const std::string &name) const {
@@ -84,6 +84,8 @@ Node *Model::find_node(const std::string &name) const {
 }
 
 void Model::start() {
+  set_resulution(time_resolution);
+  
   std::unique_ptr<ns3::ShowProgress> progress_shower;
   if (_end_time != ns3::Time{}) {
     progress_shower = std::make_unique<ns3::ShowProgress>();

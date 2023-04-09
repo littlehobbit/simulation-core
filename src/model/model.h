@@ -41,7 +41,7 @@ class Model {
   std::vector<std::shared_ptr<Registrator>> _registrators;
 
   ns3::Time _end_time{};
-  ns3::Time::Unit _precision = ns3::Time::NS;
+  ns3::Time::Unit time_resolution = ns3::Time::NS;
 };
 
 }  // namespace model

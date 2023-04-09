@@ -24,7 +24,6 @@
 
 #include <gtest/gtest.h>
 
-#include "utils/address.h"
 #include "model/application.h"
 #include "model/channel.h"
 #include "model/device.h"
@@ -34,6 +33,7 @@
 #include "model/node.h"
 #include "model/registrator.h"
 #include "parser/parser.h"
+#include "utils/address.h"
 
 template <typename AttributeType, typename ExpectedValue>
 void EXPECT_ATTRIBUTE_NE(ns3::Ptr<ns3::Object> object,
@@ -398,6 +398,46 @@ TEST_F(ModelTest, ConnectUnknownInterface) {  // NOLINT
                        .type = model::channel_type::PPP,
                        .interfaces = {"node_a/eth0", "node_b/INTERFACE"}}}};
 
+  model::Model model;
+  EXPECT_THROW(model.build_from_description(model_desc),
+               model::ModelBuildError);
+}
+
+TEST_F(ModelTest, ConnectUsedDevice_Will_Throw) {  // NOLINT
+  parser::NodeDescription node_a_desc = {
+      .name = "node_a",
+      .devices = {parser::DeviceDescription{
+          .name = "eth0",
+          .type = "PPP",
+          .ipv4_addresses = {asio::ip::make_network_v4("10.10.10.2/24")}}}};
+
+  parser::NodeDescription node_b_desc = {
+      .name = "node_b",
+      .devices = {
+          parser::DeviceDescription{
+              .name = "eth0",
+              .type = "PPP",
+              .ipv4_addresses = {asio::ip::make_network_v4("10.10.10.4/24")}},
+          parser::DeviceDescription{
+              .name = "eth1",
+              .type = "PPP",
+              .ipv4_addresses = {asio::ip::make_network_v4("10.10.10.4/24")}}}};
+
+  parser::ModelDescription model_desc = {
+      .model_name = "model",                //
+      .nodes = {node_a_desc, node_b_desc},  //
+      .connections = {{
+                          .name = "first_connection",
+                          .type = model::channel_type::PPP,
+                          .interfaces = {"node_a/eth0", "node_b/eth0"}  //
+                      },
+                      {
+                          .name = "bad_connection",
+                          .type = model::channel_type::PPP,
+                          .interfaces = {"node_a/eth0", "node_b/eth1"}  //
+                      }}};
+
+  // name_a/eth0 shoud be used - throws Error
   model::Model model;
   EXPECT_THROW(model.build_from_description(model_desc),
                model::ModelBuildError);

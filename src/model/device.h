@@ -42,9 +42,11 @@ class Device {
     return _ipv6_addresses;
   }
 
-  void attach(const std::shared_ptr<Channel> &channel);
+  void attach(const std::shared_ptr<Channel>& channel);
 
   auto channel() const -> std::shared_ptr<Channel> { return _attached_channel; }
+
+  bool has_channel() const;
 
  private:
   Device(const ns3::Ptr<ns3::NetDevice>& device, std::string name,
