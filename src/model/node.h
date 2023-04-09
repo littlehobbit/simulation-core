@@ -60,13 +60,15 @@ class Node {
 
   void create_devices(const std::vector<parser::DeviceDescription> &devices);
 
-  void add_ipv4_routes(const std::vector<parser::Ipv4Route> &routes);
-  void add_ipv6_routes(const std::vector<parser::Ipv6Route> &routes);
-
  private:
   void attach(Device &&device);
+  void setup_ipv4_interface(const Device &device);
+  void setup_ipv6_interface(const Device &device);
 
   void attach(Application &&app);
+
+  void add_ipv4_routes(const std::vector<parser::Ipv4Route> &routes);
+  void add_ipv6_routes(const std::vector<parser::Ipv6Route> &routes);
 
   static auto create_ns3_node() -> ns3::Ptr<ns3::Node>;
 

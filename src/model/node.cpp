@@ -30,6 +30,25 @@
 
 namespace model {
 
+namespace {
+template <typename AddressType>
+std::string address_to_str(const AddressType &address) {
+  std::stringstream stream;
+  address.GetAddress().Print(stream);
+  return stream.str();
+}
+}  // namespace
+
+template <typename AddressType>
+class AddressAssignError final : public ModelBuildError {
+ public:
+  explicit AddressAssignError(const AddressType &address,
+                              const std::string &device_name)
+      : ModelBuildError{
+            fmt::format("Can't assign address {} to interface \"{}\"",
+                        address_to_str(address), device_name)} {}
+};
+
 Node::Node(const ns3::Ptr<ns3::Node> &node, std::string name)
     : _name{std::move(name)},
       _node{node},
@@ -39,42 +58,36 @@ Node::Node(const ns3::Ptr<ns3::Node> &node, std::string name)
 void Node::attach(Device &&device) {
   _node->AddDevice(device.get());
 
-  {
-    auto interface = _ipv4->AddInterface(device.get());
-    _ipv4->SetUp(interface);
-    _ipv4->SetMetric(interface, 1);
-
-    for (const auto &address : device.ipv4_addresses()) {
-      if (!_ipv4->AddAddress(interface, address)) {
-        std::stringstream address_stream;
-        address.GetAddress().Print(address_stream);
-        throw ModelBuildError(
-            fmt::format("Can't assign address {} to interface \"{}\"",
-                        address_stream.str(), device.name()));
-      }
-    }
-  }
-
-  {
-    auto interface = _ipv6->AddInterface(device.get());
-    _ipv6->SetUp(interface);
-    _ipv6->SetMetric(interface, 1);
-
-    for (const auto &address : device.ipv6_addresses()) {
-      if (!_ipv6->AddAddress(interface, address)) {
-        // TODO: reduce code duplication
-        std::stringstream address_stream;
-        address.GetAddress().Print(address_stream);
-        throw ModelBuildError(
-            fmt::format("Can't assign address {} to interface \"{}\"",
-                        address_stream.str(), device.name()));
-      }
-    }
-  }
+  setup_ipv4_interface(device);
+  setup_ipv6_interface(device);
 
   names::add(_node, device.get(), device.name());
   _device_per_name.emplace(device.name(), device.get());
   _devices.push_back(std::move(device));
+}
+
+void Node::setup_ipv4_interface(const Device &device) {
+  auto interface = _ipv4->AddInterface(device.get());
+  _ipv4->SetUp(interface);
+  _ipv4->SetMetric(interface, 1);
+
+  for (const auto &address : device.ipv4_addresses()) {
+    if (!_ipv4->AddAddress(interface, address)) {
+      throw AddressAssignError(address, device.name());
+    }
+  }
+}
+
+void Node::setup_ipv6_interface(const Device &device) {
+  auto interface = _ipv6->AddInterface(device.get());
+  _ipv6->SetUp(interface);
+  _ipv6->SetMetric(interface, 1);
+
+  for (const auto &address : device.ipv6_addresses()) {
+    if (!_ipv6->AddAddress(interface, address)) {
+      throw AddressAssignError(address, device.name());
+    }
+  }
 }
 
 void Node::attach(Application &&app) {
