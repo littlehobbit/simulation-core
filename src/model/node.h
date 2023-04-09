@@ -15,10 +15,12 @@
 
 #include "application.h"
 #include "device.h"
+#include "parser/parser.h"
 
 namespace ns3 {
 class NetDevice;
-}
+class Node;
+}  // namespace ns3
 
 namespace parser {
 struct NodeDescription;
@@ -28,6 +30,8 @@ namespace model {
 
 class Node {
  public:
+  Node(const ns3::Ptr<ns3::Node> &node, std::string name);
+
   auto get() const -> ns3::Ptr<ns3::Node> { return _node; }
 
   auto get_device(std::size_t index) const -> const Device & {
@@ -51,23 +55,29 @@ class Node {
 
   auto get_device_by_name(const std::string &name) -> Device *;
 
- private:
-  Node(const ns3::Ptr<ns3::Node> &node, std::string name)
-      : _name{std::move(name)}, _node{node} {}
+  void create_applications(
+      const std::vector<parser::ApplicationDescription> &applications);
 
+  void create_devices(const std::vector<parser::DeviceDescription> &devices);
+
+  void add_ipv4_routes(const std::vector<parser::Ipv4Route> &routes);
+  void add_ipv6_routes(const std::vector<parser::Ipv6Route> &routes);
+
+ private:
   void attach(Device &&device);
 
   void attach(Application &&app);
 
+  static auto create_ns3_node() -> ns3::Ptr<ns3::Node>;
+
   std::string _name;
   ns3::Ptr<ns3::Node> _node;
-  std::vector<Device> _devices;
-  std::vector<Application> _applications;
-
-  std::map<std::string, ns3::Ptr<ns3::NetDevice>> _device_per_name;
-
   ns3::Ptr<ns3::Ipv4> _ipv4;
   ns3::Ptr<ns3::Ipv6> _ipv6;
+
+  std::vector<Device> _devices{};
+  std::vector<Application> _applications{};
+  std::map<std::string, ns3::Ptr<ns3::NetDevice>> _device_per_name{};
 };
 
 };  // namespace model
