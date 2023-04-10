@@ -13,16 +13,19 @@
 namespace model {
 
 namespace channel_factory {
-auto create(channel_type type, const parser::Attributes &attributes) {
-  ns3::Ptr<ns3::Channel> channel;
+auto create(channel_type type, const parser::Attributes &attributes)
+    -> ns3::Ptr<ns3::Channel> {
+  switch (type) {
+    case model::channel_type::CSMA:
+      return utils::create<ns3::Channel>("ns3::CsmaChannel", attributes);
 
-  if (type == channel_type::CSMA) {
-    channel = utils::create<ns3::Channel>("ns3::CsmaChannel", attributes);
-  } else if (type == channel_type::PPP) {
-    channel =
-        utils::create<ns3::Channel>("ns3::PointToPointChannel", attributes);
+    case model::channel_type::PPP:
+      return utils::create<ns3::Channel>("ns3::PointToPointChannel",
+                                         attributes);
+
+    default:
+      return nullptr;
   }
-  return channel;
 }
 }  // namespace channel_factory
 
