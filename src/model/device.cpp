@@ -23,6 +23,19 @@
 
 namespace model {
 
+namespace device_factory {
+auto create(model::device_type type) -> ns3::Ptr<ns3::NetDevice> {
+  switch (type) {
+    case device_type::CSMA:
+      return utils::create<ns3::NetDevice>("ns3::CsmaNetDevice");
+    case device_type::PPP:
+      return utils::create<ns3::NetDevice>("ns3::PointToPointNetDevice");
+    default:
+      return nullptr;
+  }
+}
+}  // namespace device_factory
+
 Device::Device(const ns3::Ptr<ns3::NetDevice> &device, std::string name,
                device_type type, std::vector<ns3::Ipv4InterfaceAddress> ipv4,
                std::vector<ns3::Ipv6InterfaceAddress> ipv6)
@@ -39,13 +52,7 @@ Device Device::create(const parser::DeviceDescription &description) {
                                       description.type, description.name));
   }
 
-  // TODO: extract creation to factory
-  ns3::Ptr<ns3::NetDevice> device{};
-  if (type == device_type::CSMA) {
-    device = utils::create<ns3::NetDevice>("ns3::CsmaNetDevice");
-  } else if (type == device_type::PPP) {
-    device = utils::create<ns3::NetDevice>("ns3::PointToPointNetDevice");
-  }
+  ns3::Ptr<ns3::NetDevice> device = device_factory::create(*type);
   device->SetAddress(ns3::Mac48Address::Allocate());
 
   try {
@@ -92,8 +99,6 @@ void Device::attach(const std::shared_ptr<Channel> &channel) {
   _attached_channel = channel;
 }
 
-bool Device::has_channel() const {
-  return _attached_channel != nullptr;
-}
+bool Device::has_channel() const { return _attached_channel != nullptr; }
 
 };  // namespace model
