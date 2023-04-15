@@ -25,3 +25,8 @@ More detailed information about XMl tags and format described in `doc/xml-format
 
 ### Examples
 Examples are stored in `examples` directory.
+
+To run example you can use
+```bash
+./simulation --xml ./examples/udp_echo.xml
+```
