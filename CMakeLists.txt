@@ -6,12 +6,13 @@ option(BUILD_TESTS ON)
 option(RUN_CLANG_TIDY ON)
 option(RUN_IWYU ON)
 
-
 find_package(fmt REQUIRED)
 find_package(Boost REQUIRED)
 find_package(tinyxml2 REQUIRED)
 find_package(ns3 REQUIRED)
 find_package(CLI11 REQUIRED)
+
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 add_executable(
   ${PROJECT_NAME}
@@ -66,14 +67,15 @@ target_link_libraries(
   ${LIB_AS_NEEDED_POST}
 )
 
-include(cmake/clang-tidy.cmake)
-include(cmake/iwyu.cmake)
+include(clang-tidy)
+include(iwyu)
 
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 target_compile_features(${PROJECT_NAME}_lib PRIVATE cxx_std_17)
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 set_property(TARGET ${PROJECT_NAME}_lib PROPERTY CXX_STANDARD 17)
+
 
 if (${BUILD_TESTS})
   enable_testing()

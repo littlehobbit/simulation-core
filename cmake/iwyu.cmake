@@ -11,15 +11,18 @@ if (${RUN_IWYU})
                                "-Xiwyu" "--verbose=1"
                                "-Xiwyu" "--cxx17ns"
     )
+
+    set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE ${IWYU_EXE})
+    set(CMAKE_C_INCLUDE_WHAT_YOU_USE ${IWYU_EXE})
+
+    # set_property(
+    #   TARGET ${PROJECT_NAME} 
+    #   PROPERTY CXX_INCLUDE_WHAT_YOU_USE "${IWYU_EXE}"
+    # )
     
-    set_property(
-      TARGET ${PROJECT_NAME} 
-      PROPERTY CXX_INCLUDE_WHAT_YOU_USE "${IWYU_EXE}"
-    )
-    
-    set_property(
-      TARGET ${PROJECT_NAME}_lib
-      PROPERTY CXX_INCLUDE_WHAT_YOU_USE "${IWYU_EXE}"
-    )
+    # set_property(
+    #   TARGET ${PROJECT_NAME}_lib
+    #   PROPERTY CXX_INCLUDE_WHAT_YOU_USE "${IWYU_EXE}"
+    # )
   endif()
 endif()
