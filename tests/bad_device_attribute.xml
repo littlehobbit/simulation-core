@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model name="udp_echo">
   <populate-routing-tables>true</populate-routing-tables>
-  <duration>33s</duration>
-  <precision>NS</precision>
 
   <node name="Client">
     <device-list>
-      <device name="eth0" 
+      <device
+              name="eth0" 
               type="Csma" >  
         <address value="10.1.22.222" netmask="255.255.255.0"/>
 
         <attributes>
           <attribute key="TxQueue" value="ns3::DropTailQueue<Packet>[MaxSize=100p]"/>
-          <attribute key="Address" value="AB:CD:EF:01:02:03"/>
+          <attribute key="Add" value="AB:CD:EF:01:02:03"/>
           <attribute key="Mtu" value="1200"/>
           <attribute key="EncapsulationMode" value="Llc"/>
         </attributes>
@@ -24,8 +23,6 @@
         <attributes>
           <attribute key="RemotePort" value="666"/>
           <attribute key="RemoteAddress" value="0-4-0A:01:16:02"/>
-          <attribute key="MaxPackets" value="10000000"/>
-          <attribute key="Interval" value="1ms"/>
         </attributes>
       </application>
     </applications>

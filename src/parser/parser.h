@@ -24,7 +24,6 @@ namespace parser {
 using Attributes = std::map<std::string, std::string>;
 
 struct DeviceDescription {
-  std::uint64_t id;
   std::string name;
   std::string type;
 
@@ -58,7 +57,6 @@ struct RoutingDescription {
 };
 
 struct NodeDescription {
-  std::uint64_t id;
   std::string name;
   std::vector<DeviceDescription> devices;
   std::vector<ApplicationDescription> applications;
@@ -66,7 +64,6 @@ struct NodeDescription {
 };
 
 struct ConnectionDescription {
-  std::uint64_t id;
   std::string name;
   model::channel_type type;
   std::vector<std::string> interfaces;

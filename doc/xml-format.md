@@ -70,7 +70,6 @@
 ```
 
 ## `<node>`
-<!-- TODO: рассмотреть возможность добавления id поля к элементам списка для определения очередности их инициализации -->
 Тег описания элемента сети, содержащий следующие атрибуты:
   - `name` - описание имени элемента сети
   - `<device-list>` - список сетевых устройств
@@ -91,8 +90,8 @@
 
 ```xml
 <device-list>
-  <device id="0"> ... </device>
-  <device id="1"> ... </device>
+  <device> ... </device>
+  <device> ... </device>
   ...
 </device-list>
 ```
@@ -110,8 +109,7 @@
 `<attributes>` - список атрибутов ns3 и их значений
 
 ```xml
-<device id="0"
-        name="eth0" 
+<device name="eth0" 
         type="Csma">  
   <address value="10.01.22.222" netmask="255.255.255.0"/>
   <address value="2022:dead:beef:2023::0" prefix="64"/>
@@ -149,7 +147,6 @@
 
 ### `<application>`
 Описание приложений-генератор трафика
-<!-- TODO: maybe store ID -->
 Атрибуты:
   - `name` - имя
   - `type` - тип
@@ -186,8 +183,7 @@
 
 ```xml
 <connections>
-  <connection id="0" 
-              name="nodea/eth0-to-nodeb/eth1" 
+  <connection name="nodea/eth0-to-nodeb/eth1" 
               type="Csma">
     <interfaces>
       <interface>node1/eth0</interface>
@@ -214,9 +210,8 @@
   - `file` - название файла назначения
   - `start` (опциональный) - время инициализации и начала работы регистратора
   - `end` (опциональный) - время завершения работы регистратора
-  <!-- TODO: опциональный атрибут размера кэша -->
 
-<!-- TODO: Описывать атрибуты регистратора?  -->
+
 ```xml
 <statistics>
   <registrator source="/Names/node-a/$ns3::TcpL4Protocol/SocketList/0/CongestionWindow"
@@ -238,10 +233,9 @@
   <precision>NS</precision>
 
   <node-list>
-    <node id="0" name="Client">
+    <node name="Client">
       <device-list>
-        <device id="0"
-                name="eth0" 
+        <device name="eth0" 
                 type="Csma" >  
           <address value="10.01.22.222" netmask="255.255.255.0"/>
 
@@ -263,9 +257,9 @@
       </applications>
     </node>
 
-    <node id="1" name="Server">
+    <node name="Server">
       <device-list>
-        <device id="0" name="eth0" type="Csma">
+        <device name="eth0" type="Csma">
           <address value="10.01.22.2" netmask="255.255.255.0"/>
             <attribures>
               <attribute key="Mtu" value="1200"/>

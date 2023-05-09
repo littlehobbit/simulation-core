@@ -59,9 +59,9 @@ TEST(XmlParse, ReadingNode) {  // NOLINT
         <model name="CsmaNetworkModel">
           <populate-routing-tables>true</populate-routing-tables>
           
-          <node id="0" name="test">
+          <node name="test">
             <device-list>
-              <device id="0" name="eth0" type="Csma" mac="AB:CD:EF:01:02:03">
+              <device name="eth0" type="Csma" mac="AB:CD:EF:01:02:03">
                 <address value="10.1.22.222" netmask="255.255.255.0"/>
                 <address value="2022:dead:beef:2023::1" prefix="64"/>
 
@@ -97,13 +97,11 @@ TEST(XmlParse, ReadingNode) {  // NOLINT
 
   ASSERT_EQ(res.nodes.size(), 1);
   auto& node = res.nodes.front();
-  EXPECT_EQ(node.id, 0);
   EXPECT_EQ(node.name, "test");
 
   // devices
   ASSERT_EQ(node.devices.size(), 1);
   auto& device = node.devices.front();
-  EXPECT_EQ(device.id, 0);
   EXPECT_EQ(device.name, "eth0");
   EXPECT_EQ(device.type, "Csma");
 
@@ -146,7 +144,7 @@ TEST(XmlParse, ReadsConnections) {  // NOLINT
         <?xml version="1.0" encoding="UTF-8"?>
         <model name="test_model">
           <connections>
-            <connection id="0" name="test" type="Csma">
+            <connection name="test" type="Csma">
               <interfaces>
                 <interface>eth0</interface>
                 <interface>eth1</interface>
@@ -222,26 +220,12 @@ TEST(XmlParse, IncorrectNodeReading) {  // NOLINT
   parser::XmlParser parser;
 
   {
-    // none id
-    const auto* xml =
-        R"(
-        <?xml version="1.0" encoding="UTF-8"?>
-        <model name="CsmaNetworkModel">
-          <node name="test">
-          </node>
-        </model>
-    )";
-
-    EXPECT_THROW(parser.parse(xml), parser::ParseError);
-  }
-
-  {
     // none name
     const auto* xml =
         R"(
         <?xml version="1.0" encoding="UTF-8"?>
         <model name="CsmaNetworkModel">
-          <node id="0">
+          <node>
           </node>
         </model>
     )";
@@ -259,9 +243,9 @@ TEST(XmlParse, BadAttributes) {  // NOLINT
         <model name="CsmaNetworkModel">
           <populate-routing-tables>true</populate-routing-tables>
           
-          <node id="0" name="test">
+          <node name="test">
             <device-list>
-              <device id="0" name="eth0" type="Csma">
+              <device name="eth0" type="Csma">
                 <attributes>
                   <attribute key="Mtu"/>
                 </attributes>
@@ -280,9 +264,9 @@ TEST(XmlParse, BadAttributes) {  // NOLINT
         <model name="CsmaNetworkModel">
           <populate-routing-tables>true</populate-routing-tables>
           
-          <node id="0" name="test">
+          <node name="test">
             <device-list>
-              <device id="0" name="eth0" type="Csma">
+              <device name="eth0" type="Csma">
                 <attributes>
                   <attribute value="2"/>
                 </attributes>

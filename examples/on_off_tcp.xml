@@ -4,10 +4,9 @@
   <duration>20s</duration>
   <precision>NS</precision>
 
-  <node id="0" name="Client">
+  <node name="Client">
     <device-list>
-      <device id="0"
-              name="eth0" 
+      <device name="eth0" 
               type="Csma" >  
         <address value="10.1.22.222" netmask="255.255.255.0"/>
 
@@ -33,9 +32,9 @@
     </applications>
   </node>
 
-  <node id="1" name="Server">
+  <node name="Server">
     <device-list>
-      <device id="0" name="eth0" type="Csma">
+      <device name="eth0" type="Csma">
         <address value="10.1.22.2" netmask="255.255.255.0"/>
           <attributes>
             <attribute key="TxQueue" value="ns3::DropTailQueue&lt;Packet&gt;[MaxSize=100p]"/>
@@ -56,7 +55,7 @@
   </node>
 
   <connections>
-    <connection id="0" name="Client-to-Server" type="Csma">
+    <connection name="Client-to-Server" type="Csma">
       <interfaces>
         <interface>Client/eth0</interface>
         <interface>Server/eth0</interface>
@@ -77,7 +76,7 @@
                  file="cwnd"/>
 
     <registrator value_name="Bytes" 
-                  type="ns3::Ipv4PacketProbe" 
+                 type="ns3::Ipv4PacketProbe" 
                  source="/NodeList/0/$ns3::Ipv4L3Protocol/Tx" 
                  start="0s" 
                  file="sender_interface_write" 

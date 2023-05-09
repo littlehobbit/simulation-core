@@ -37,7 +37,6 @@ constexpr auto registrator_tag = "registrator";
 constexpr auto duration_tag = "duration";
 constexpr auto precision_tag = "precision";
 
-constexpr auto id_attr = "id";
 constexpr auto name_attr = "name";
 constexpr auto type_attr = "type";
 constexpr auto mac_attr = "mac";
@@ -99,7 +98,7 @@ void XmlParser::parse_model_settings(const tinyxml2::XMLElement *root,
   if (precision != nullptr) {
     auto precision_str = std::string{precision->GetText()};
     auto val = parser::util::parse_precision(precision_str);
-    
+
     if (val.has_value()) {
       description.time_precision = *val;
     } else {
@@ -113,15 +112,13 @@ auto XmlParser::parse_nodes(const tinyxml2::XMLElement *root)
   std::vector<NodeDescription> nodes;
   for (const auto &node : xml_element_range(root, node_tag)) {
     // NOTE: doesn't validate uint64 value
-    auto id = node.get_attribute<std::uint64_t>(id_attr);
     auto node_name = node.get_attribute<std::string>(name_attr);
 
     auto devices = parse_devices(node.element);
     auto applications = parse_applications(node.element);
     auto routing = parse_routing(node.element);
 
-    nodes.emplace_back(NodeDescription{.id = id,
-                                       .name = std::move(node_name),
+    nodes.emplace_back(NodeDescription{.name = std::move(node_name),
                                        .devices = std::move(devices),
                                        .applications = std::move(applications),
                                        .routing = std::move(routing)});
@@ -137,8 +134,6 @@ auto XmlParser::parse_devices(const tinyxml2::XMLElement *node)
 
   if (device_list != nullptr) {
     for (const auto &device : xml_element_range(device_list, device_tag)) {
-      auto id = device.get_attribute<std::uint64_t>(id_attr);
-
       // TODO: how does string allocated?
       auto name = device.get_attribute<std::string>(name_attr);
 
@@ -146,8 +141,7 @@ auto XmlParser::parse_devices(const tinyxml2::XMLElement *node)
       auto [ipv4, ipv6] = parse_addresses(device.element);
       auto attributes = parse_attributes(device.element);
 
-      devices.push_back(DeviceDescription{.id = id,
-                                          .name = std::move(name),
+      devices.push_back(DeviceDescription{.name = std::move(name),
                                           .type = std::move(type),
                                           .ipv4_addresses = std::move(ipv4),
                                           .ipv6_addresses = std::move(ipv6),
@@ -282,8 +276,6 @@ auto XmlParser::parse_connections(const tinyxml2::XMLElement *model)
   if (tag != nullptr) {
     for (const auto &connection : xml_element_range(tag, connection_tag)) {
       auto name = connection.get_attribute<std::string>(name_attr);
-      auto id = connection.get_attribute<std::uint64_t>(id_attr);
-
       auto type = connection.get_attribute<std::string>(type_attr);
       auto transformed_type = model::channel_from_string(type);
 
@@ -296,8 +288,7 @@ auto XmlParser::parse_connections(const tinyxml2::XMLElement *model)
       auto attributes = parse_attributes(connection.element);
 
       connections.push_back(
-          ConnectionDescription{.id = id,
-                                .name = std::move(name),
+          ConnectionDescription{.name = std::move(name),
                                 .type = *transformed_type,
                                 .interfaces = std::move(interfaces),
                                 .attributes = std::move(attributes)});
