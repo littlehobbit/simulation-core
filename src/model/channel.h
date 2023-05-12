@@ -7,6 +7,8 @@
 #include <string_view>
 #include <utility>
 
+#include <boost/algorithm/string/case_conv.hpp>
+
 #include <ns3/channel.h>
 #include <ns3/ptr.h>
 
@@ -39,13 +41,14 @@ class Channel {
   channel_type _type;
 };
 
-constexpr auto channel_from_string(std::string_view str) noexcept
+inline auto channel_from_string(const std::string& str) noexcept
     -> std::optional<channel_type> {
-  if (str == "Csma") {
+  auto type = boost::algorithm::to_lower_copy(str);
+  if (type == "csma") {
     return channel_type::CSMA;
   }
 
-  if (str == "Ppp") {
+  if (type == "ppp") {
     return channel_type::PPP;
   }
 
