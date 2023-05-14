@@ -28,10 +28,19 @@ struct NodeDescription;
 
 namespace model {
 
+/**
+ * @brief ns3::Node wrapper with helper function
+ *
+ */
 class Node {
  public:
   Node(const ns3::Ptr<ns3::Node> &node, std::string name);
 
+  /**
+   * @brief Get node ptr
+   *
+   * @return ns3::Ptr<ns3::Node>
+   */
   auto get() const -> ns3::Ptr<ns3::Node> { return _node; }
 
   auto get_device(std::size_t index) const -> const Device & {
@@ -40,24 +49,61 @@ class Node {
 
   auto devices_count() const -> std::size_t { return _devices.size(); }
 
+  /**
+   * @brief Get applications list
+   *
+   * @return const std::vector<Application>&
+   */
   auto applications() const -> const std::vector<Application> & {
     return _applications;
   }
 
+  /**
+   * @brief Get Ipv4 component
+   *
+   * @return ns3::Ptr<ns3::Ipv4>
+   */
   auto ipv4() const -> ns3::Ptr<ns3::Ipv4> { return _ipv4; }
 
+  /**
+   * @brief Get Ipv6 component
+   *
+   * @return ns3::Ptr<ns3::Ipv6>
+   */
   auto ipv6() const -> ns3::Ptr<ns3::Ipv6> { return _ipv6; }
 
   auto name() const -> const std::string & { return _name; }
 
+  /**
+   * @brief Create node from description
+   *
+   * @param description
+   * @return std::unique_ptr<Node>
+   */
   static auto create(const parser::NodeDescription &description)
       -> std::unique_ptr<Node>;
 
+  /**
+   * @brief Get the device by name object
+   *
+   * @param name
+   * @return Device*
+   */
   auto get_device_by_name(const std::string &name) -> Device *;
 
+  /**
+   * @brief Create a applications by descriptions
+   *
+   * @param applications
+   */
   void create_applications(
       const std::vector<parser::ApplicationDescription> &applications);
 
+  /**
+   * @brief Create a devices by descriptions
+   *
+   * @param devices
+   */
   void create_devices(const std::vector<parser::DeviceDescription> &devices);
 
  private:

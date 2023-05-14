@@ -27,18 +27,35 @@ inline void check_for_duplicate(const ns3::Ptr<ns3::Object> &context,
                                 const std::string &name);
 }  // namespace internal
 
+/**
+ * @brief Assign name to object in ns3 name service
+ *
+ * @param object
+ * @param name
+ */
 inline void add(const ns3::Ptr<ns3::Object> &object, const std::string &name) {
   // ns3::Names::FindName(object) - already has
   internal::check_for_duplicate(name);
   ns3::Names::Add(name, object);
 }
 
+/**
+ * @brief Assign name to object with context
+ *
+ * @param context
+ * @param object
+ * @param name
+ */
 inline void add(const ns3::Ptr<ns3::Object> &context,
                 const ns3::Ptr<ns3::Object> &object, const std::string &name) {
   internal::check_for_duplicate(context, name);
   ns3::Names::Add(context, name, object);
 }
 
+/**
+ * @brief Clean all registered names
+ *
+ */
 inline void cleanup() noexcept { ns3::Names::Clear(); }
 
 namespace internal {

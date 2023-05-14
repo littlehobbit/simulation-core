@@ -26,10 +26,19 @@ class Channel;
 
 enum class device_type { Undedined, CSMA, PPP };
 
+/**
+ * @brief ns3::NetDevice wrapper
+ *
+ */
 class Device {
  public:
   static Device create(const parser::DeviceDescription& description);
 
+  /**
+   * @brief Get device pointer
+   *
+   * @return ns3::Ptr<ns3::NetDevice>
+   */
   auto get() const -> ns3::Ptr<ns3::NetDevice> { return _device; }
 
   auto name() const -> const std::string& { return _name; }
@@ -42,6 +51,11 @@ class Device {
     return _ipv6_addresses;
   }
 
+  /**
+   * @brief Attach device to channel
+   *
+   * @param channel
+   */
   void attach(const std::shared_ptr<Channel>& channel);
 
   auto channel() const -> std::shared_ptr<Channel> { return _attached_channel; }

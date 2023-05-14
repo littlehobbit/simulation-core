@@ -36,6 +36,15 @@ class BadAttribute : public std::logic_error {
   std::string value;
 };
 
+/**
+ * @brief Set the attributes object
+ *
+ * Helper function to set attributes of ns-3 object by using
+ *
+ * @param object
+ * @param attributes
+ * @throws BadAttribute if can't set attribute
+ */
 inline void set_attributes(ns3::Ptr<ns3::Object> object,
                            const Attributes &attributes) {
   for (const auto &[key, value] : attributes) {
@@ -45,6 +54,14 @@ inline void set_attributes(ns3::Ptr<ns3::Object> object,
   }
 }
 
+/**
+ * @brief Create ns3::Object with specifies type_id and attributes
+ *
+ * @param type_id type indentifier
+ * @param attributes map of attributes
+ * @return ns3::Ptr<ns3::Object>
+ * @throws BadTypeId if there no such `type_id`
+ */
 inline auto create(const std::string &type_id,
                    const Attributes &attributes = {}) -> ns3::Ptr<ns3::Object> {
   ns3::TypeId id{};
@@ -60,6 +77,14 @@ inline auto create(const std::string &type_id,
   return object;
 }
 
+/**
+ * @brief Create ns3::Object and cast it to type T
+ *
+ * @tparam T
+ * @param type_id
+ * @param attributes
+ * @return ns3::Ptr<T>
+ */
 template <typename T>
 inline auto create(const std::string &type_id,
                    const Attributes &attributes = {}) -> ns3::Ptr<T> {
