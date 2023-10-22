@@ -1,0 +1,107 @@
+name: Release
+
+on: [push]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions: write-all
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Install toolkit
+      run: |
+        sudo apt update \
+          && sudo apt install -y cmake g++ make libgtest-dev libgmock-dev \
+          clang-tidy lcov gcovr python3-pip doxygen
+
+    - name: Install conan
+      run: sudo pip install conan
+
+    - name: Install conan dependencies
+      run: conan profile detect && conan install . -of build --build missing
+
+    - name: Install ns-3
+      run: |
+        cd ${{github.workspace}}/deps && sudo apt install ./NS3-3.38.0-Linux.deb
+
+    - name: Get Version
+      id: get_version
+      uses: PaulHatch/semantic-version@v5.0.3
+      with:
+        tag_prefix: ""
+        bump_each_commit: false
+        version_format: "${major}.${minor}.${patch}"
+
+    - name: Get Branch Name
+      id: get_branch
+      uses: tj-actions/branch-names@v7
+
+    - name: Configure CMake
+      env:  
+        VERSION: ${{steps.get_version.outputs.version}}
+      run: |
+        cmake -B ${{github.workspace}}/build                                          \
+            -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/build/conan_toolchain.cmake  \
+            -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}                                    \
+            -DBUILD_TESTS=ON                                                          \
+            -DBUILD_DOCS=ON                                                           \
+            -DBUILD_PACKAGE=ON                                                        \
+            -DVERSION=${{env.VERSION}}
+
+    - name: Build
+      run: |
+        source ${{github.workspace}}/build/conanbuild.sh \
+          && cmake --build ${{github.workspace}}/build \
+                   --config ${{env.BUILD_TYPE}} --parallel
+
+    - name: Test
+      working-directory: ${{github.workspace}}/build
+      run: ctest -C ${{env.BUILD_TYPE}}
+
+    - name: Create package
+      working-directory: ${{ github.workspace }}/build
+      run: cpack -C ${{env.BUILD_TYPE}}
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        COMMIT_DISTANCE: ${{steps.get_version.outputs.increment}}
+        BRANCH: ${{steps.get_branch.outputs.current_branch}}
+      with:
+        tag_name: ${{env.BRANCH}}/${{steps.get_version.outputs.version}}-${{env.COMMIT_DISTANCE}}
+        release_name: Release ${{env.BRANCH}}/${{steps.get_version.outputs.version}}-${{env.COMMIT_DISTANCE}}
+        draft: false
+        prerelease: false
+
+    - name: Upload Assets
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        COMMIT_DISTANCE: ${{steps.get_version.outputs.increment}}
+        COMMIT_HASH: ${{steps.get_version.outputs.current_commit}}
+        BRANCH: ${{steps.get_branch.outputs.current_branch}}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./build/bayan-${{steps.get_version.outputs.version}}-Linux.deb
+        asset_name: bayan-${{env.BRANCH}}-${{steps.get_version.outputs.version}}-${{env.COMMIT_DISTANCE}}-Linux.deb
+        asset_content_type: application/vnd.debian.binary-package
+
+    - name: Upload docs
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./build/docs/html/
+        enable_jekyll: false
+        allow_empty_commit: false
+        force_orphan: true
+        publish_branch: gh-pages
+
