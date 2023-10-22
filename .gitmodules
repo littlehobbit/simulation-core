@@ -1,3 +1,0 @@
-[submodule "deps/ns-3"]
-	path = deps/ns-3
-	url = git@github.com:nsnam/ns-3-dev-git.git
