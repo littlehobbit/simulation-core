@@ -1,2 +1,4 @@
 ignore:
   - "tests"
+  - "src/main.cpp"
+  - "src/app_config.*"
