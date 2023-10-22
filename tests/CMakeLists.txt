@@ -19,8 +19,8 @@ target_include_directories(
 target_link_libraries(
   ${PROJECT_NAME} PRIVATE
   simulation_lib
-  GTest::GTest
-  GTest::Main
+  GTest::gtest
+  GTest::gtest_main
   gmock
 
   # FIX: fix for loading static type information on start-up

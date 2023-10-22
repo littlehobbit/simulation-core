@@ -1,0 +1,9 @@
+[requires]
+cli11/[>=2]
+boost/1.74.0
+tinyxml2/9.0.0
+fmt/[>=10]
+
+[generators]
+CMakeToolchain
+CMakeDeps

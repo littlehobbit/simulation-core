@@ -9,12 +9,12 @@ option(RUN_CLANG_TIDY OFF)
 option(RUN_IWYU OFF)
 option(ENABLE_COVERAGE OFF)
 
-# TODO: Load from conan
 find_package(fmt REQUIRED)
 find_package(Boost REQUIRED)
 find_package(tinyxml2 REQUIRED)
-find_package(ns3 REQUIRED)
 find_package(CLI11 REQUIRED)
+
+find_package(ns3 REQUIRED)
 
 
 add_library(
