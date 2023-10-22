@@ -1,4 +1,7 @@
-# simulation-core
+# simulation-core 
+[![codecov](https://codecov.io/github/littlehobbit/simulation-core/graph/badge.svg?token=SJDBDMNCNG)](https://codecov.io/github/littlehobbit/simulation-core)
+[![Test](https://github.com/littlehobbit/simulation-core/actions/workflows/test.yml/badge.svg)](https://github.com/littlehobbit/simulation-core/actions/workflows/test.yml)
+
 Tool for creating NS-3 topologies dynamicly using XML profile.
 
 ## Installation
