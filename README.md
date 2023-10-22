@@ -5,10 +5,7 @@
 Tool for creating NS-3 topologies dynamicly using XML profile.
 
 ## Installation
-To build and install tool you need to install dependencies:
-  - [`CLI11`](https://github.com/CLIUtils/CLI11)
-  - [`ns-3`](https://gitlab.com/nsnam/ns-3-dev)
-  - `fmt` - `apt install libfmt-dev`
+To build and install tool you need to install dependencies from conan, also install [`ns-3`](https://gitlab.com/nsnam/ns-3-dev).
 
 To build and run tests, you need install `googletests` package.
 
