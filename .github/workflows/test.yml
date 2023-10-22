@@ -1,0 +1,57 @@
+name: Test
+
+on: [push]
+
+env:
+  BUILD_TYPE: Release
+  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+
+    - name: Install toolkit
+      run: |
+        sudo apt update \
+          && sudo apt install -y cmake g++ make libgtest-dev libgmock-dev \
+            clang-tidy lcov gcovr python3-pip
+
+    - name: Install conan
+      run: sudo pip install conan
+
+    - name: Install conan dependencies
+      run: conan profile detect && conan install . -of build --build missing
+    
+    - name: Install ns-3
+      run: |
+        cd ${{github.workspace}}/deps/ns-3 && cmake . && sudo cmake build . --target install
+
+    - name: Configure CMake
+      run: |
+        cmake -B ${{github.workspace}}/build          \
+              -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/build/conan_toolchain.cmake \
+              -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}  \
+              -DENABLE_COVERAGE=ON                    \
+              -DBUILD_TESTS=ON
+
+    - name: Build
+      run: |
+        source ${{github.workspace}}/build/conanbuild.sh \
+            && cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --parallel
+
+    - name: Test
+      working-directory: ${{github.workspace}}/build
+      run: ctest -C ${{env.BUILD_TYPE}}
+
+    - name: Coverage test
+      working-directory: ${{github.workspace}}/build
+      run: make gcovr
+      
+    - name: Collect Code Coverage
+      run: bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
+
