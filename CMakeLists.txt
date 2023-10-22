@@ -90,6 +90,15 @@ if (${BUILD_TESTS})
   if (${ENABLE_COVERAGE})
     include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/code_coverage.cmake)
 
+    append_coverage_compiler_flags()
+    append_coverage_compiler_flags_to_target(${PROJECT_NAME}_lib)
+
+    set(
+      COVERAGE_EXCLUDES
+      "${PROJECT_SOURCE_DIR}/src/main.cpp"
+      "${PROJECT_SOURCE_DIR}/src/app_config.cpp"
+    )
+
     setup_target_for_coverage_gcovr_html(
       NAME gcovr_html
       EXECUTABLE ctest

@@ -11,11 +11,6 @@ add_executable(
   set_attribute_tests.cpp
 )
 
-target_include_directories(
-  ${PROJECT_NAME} PRIVATE 
-  ${CMAKE_SOURCE_DIR}/src
-)
-
 target_link_libraries(
   ${PROJECT_NAME} PRIVATE
   simulation_lib
