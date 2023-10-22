@@ -29,7 +29,7 @@ jobs:
     
     - name: Install ns-3
       run: |
-        cd ${{github.workspace}}/deps/ns-3 && cmake . && sudo cmake --build . --target install --parallel
+        cd ${{github.workspace}}/deps/ns-3 && cmake . && sudo cmake --build . --target install --parallel `nproc --ignore 1`
 
     - name: Configure CMake
       run: |
